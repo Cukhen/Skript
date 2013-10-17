@@ -1,0 +1,201 @@
+%Header
+\documentclass{scrartcl}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}	%Umlaute
+\usepackage{paralist}
+\usepackage{amsmath}        % align.
+\usepackage[justification=centering]{caption} % Für \caption
+\usepackage{graphicx}
+\usepackage{chngcntr}
+\usepackage{units}
+\usepackage{amssymb}
+\usepackage[locale = DE]{siunitx}
+\usepackage{rotating}
+\counterwithin{equation}{section}
+
+\begin{document}
+\title{Computergestüzte Methoden der exakten Naturwissenschaften}
+\author{Prof. Dr. Roland Netz}           
+\maketitle
+\tableofcontents
+\newpage
+%Header
+
+\section{Fehler}
+Ein Ziel der Naturwissenschaften ist die Beschreibung der Natur mit Hilfe von mathematischen Gleichungen und deren Lösungen, daraus ergibt sich allerdings ein Problem.
+\begin{itemize}
+\item[\textbf{Problem:}] Die Gleichungen der naturwissenschaftlichen  Beschreibungen können nicht immer mit Bleistift und Papier zu gelöst werden.
+\item[\textbf{Lösung 1:}] Vereinfachung der Gleichungen $\hat{=}$ Näherung/Approximation
+\item[\textbf{Lösung 2:}] Numerische Lösung der Gleichungen.
+\end{itemize}
+Diese Vorlesung möchte sich mit der zweiten Lösungsmethode befassen, hierbei ist es allerdings wichtig die Genauigkeit der numerisch ermittelten Ergebnisse (die Fehler) mit zu berücksichtigen.
+
+  Allgemein gibt es für es verschiedene Quellen für Fehler:
+\begin{itemize}
+ \item[\textbf{Eingabefehler:}] Diese entstehen durch Ungenauigkeiten innerhalb der Eingabedaten.
+  \item[\textbf{Näherungsfehler:}] Solche entstehen aus der Verwendung vereinfachter mathematischer Ausdrücke anstelle der exakten.
+  \item[\textbf{Modellfehler:}] Diese entstehen aus der Nutzung vereinfachter physikalischer Modelle.
+  \item[\textbf{Rundungsfehler:}] Solche entstehen aus der numerischen Darstellung von Zahlen und der damit verbundenen endlichen Genauigkeit.
+\end{itemize}
+
+\subsection{Beispiele für Näherungsfehler}
+Viele mathematische Gleichungen der Physik sind in ihren exakten Formulierungen nicht oder nur sehr aufwendig lösbar. Ein Ausweg stellen Approximationen dar aus welchen allerdings zusätzliche Näherungsfehler resultieren.
+Beispiele hierfür sind über unendliche Reihen definierte Funktionen aber auch Differentialgleichungen im Kontinuum.
+\begin{itemize}
+\item[\textbf{Exponentialfunktion:}]Die Exponentialfunktion ist definiert durch:
+\begin{align*}
+e^x=\sum_{n=0}^{\infty}\frac{x^n}{n!}.
+\end{align*}
+Eine solche Funktion kann durch eine endliche Reihe genähert werden:
+\begin{align*}
+e^x=\sum_{n=0}^{N}\frac{x^n}{n!}
+\end{align*}
+\item[\textbf{Differentialgleichung im Kontinuum:}]Eine Differentialgleichung im Kontinuum kann durch die Lösung der zugehörigen diskretisierten Gleichung genähert werden.
+Sei die Differentialgleichung gegeben durch:
+\begin{align*}
+\frac{d}{dx}f(x)=a \ f(x),
+\end{align*}
+so ergibt sich die dikretisierte Gleichung aus der Diskretisierung auf  
+bestimmte Gitterpunkte $x_i$ mit dem Abstand $\Delta x=x_{i+1}-x_i$:
+\begin{align*}
+\frac{f(x_{i+1})-f(x_i)}{x_{i+1}-x_i}=a \ \frac{f(x_{i+1})+f(x_i)}{2}.
+\end{align*}
+Zur Verbesserung der Diskretisierung kann dann $\Delta x$ immer weiter gegen $0$ gesetzt werden.
+Ein \textit{Nachteil} ist hierbei die Erhöhung der Rechenoperationen und der damit verbundenen Rechenzeit. Außerdem vergrößern sich hiermit die Rundungsfehler.
+\end{itemize}
+Das Ziel der Numerik besteht nun im optimalen Kompromiss zwischen Fehler und Rechenzeit.
+
+\subsection{Beispiel für Modellfehler}
+Als Beispiel für einen aus einem Modell resultierenden Fehler wird die Planetenbewegung betrachtet. Nach dem ersten newtonschen Gesetz gilt:
+\begin{align*}
+\textbf{F}=m \textbf{a}=m \boldsymbol{\ddot{r}}=-\frac{M \ \textbf{r}}{|\textbf{r}|^3}
+\end{align*}
+Hierbei gehen allerdings eine reihe von Näherungen ein:
+\begin{itemize}
+\item Die Sonnenmasse $M$ wird relativ zur Planetenmasse als sehr groß angenommen
+\item Eine geschwindigkeitsabhängige Reibungskraft $\boldsymbol{F_R}=\gamma \ \boldsymbol{\dot{r}}$ wird vernachlässigt, diese ist allerdings für kleinere Objekte wichtig.
+\item Auch relativistische Effekte werden vernachlässigt, solche erklären allerdings Phänomene wie die Periheldrehung des Merkurs.
+\item Eigentlich handelt es sich um ein Mehrkörperproblem der Form:
+\begin{align*}
+m_1 \boldsymbol{\ddot{r_i}}=\sum \boldsymbol F_i=- \sum_{j\neq i} G m_i m_j \frac{\boldsymbol{r_i}-\boldsymbol{r_j}}{|\boldsymbol{r_i}-\boldsymbol{r_j}|^3}.
+\end{align*}
+Eine Gleichung für mehr als 3 Objekte kann so also leicht geschrieben werden.
+Allerdings ist das Problem bereits ab einer Beteiligung von 3 Objekten nur noch unter Annahme bestimmter Bedingungen und ab 4 Objekten überhaupt nicht mehr exakt lösbar.
+\end{itemize}
+
+\subsection{Rundungsfehler}
+Beim durchführen von Rechenoperationen mit reellen Zahlen am Computer muss gerundet werden, die daraus entstehenden Fehler heißen Rundungsfehler. 
+\subsubsection{Gleitpunktarithmetik}
+Reelle Zahlen werden am Computer in das Gleitpunktformat umgewandelt.
+Der Vorteil gegenüber dem Festpunktformat liegt im geringeren Speicherbedarf.
+Hierzu werden die eingegebenen Zahlen in der Form:
+\begin{align*}
+x=\pm \sum_{i=1}^n z_i \ B^{E-i} := \pm (\underbrace{0,z_1 z_2 ... z_n}_\text{Mantisse})_B \ B^E 
+\end{align*}
+dargestellt.
+Dabei gilt des weiteren für den Exponenten $E \in \mathbb{Z}$: $m \le E \le M$.
+Außerdem gilt $z_i \in \{0,1...B-1\}$. \\
+\textbf{Beispiel}:\\
+\begin{align*}
+1234,567=(0,1234567)_{10} \cdot 10^4
+\end{align*}
+
+Die Werte für $n$, $B$, $m$ und $M$ sind hierbei maschinenabhängig, werden also durch den Rechner und den Compiler bestimmt. \\
+Übliche Basen sind:
+\begin{itemize}
+\item[$B=2$:] Dualzahlen
+\item[$B=8$:] Oktalzahlen
+\item[$B=10$:] Dezimalzahlen
+\item[$B=16$:] Hexadezimalzahlen
+\end{itemize}
+\textbf{Standartformate für B=2:}\\
+\textbf{Single:}
+Dieses Format besteht aus 32 Bits bzw. 4 Bytes.
+Diese ergeben sich aus:
+\begin{itemize}
+\item[Vorzeichen:] 1 Bit
+\item[Exponent:] 8 Bits
+\item[Mantisse:] 23 Bits
+\item[Genauigkeit:] 6 Ziffern unterscheidbar
+\end{itemize}
+\textbf{Double:}
+Dieses Format besteht hingegen aus 64 Bits:
+\begin{itemize}
+\item[Vorzeichen:] 1 Bit
+\item[Exponent:] 11 Bits
+\item[Mantisse:] 52 Bits
+\item[Genauigkeit:] 15 Ziffern unterscheidbar
+\end{itemize}
+\textbf{Beispiel}
+Binäre Darstellung von $(5,0625)_{10}$:
+\begin{align*}
+(5,0625)_{10}=(0,50625)_{10} \cdot 10^1=2^2+2^0+2^{-3}+2^{-4}\\
+\Rightarrow (5,0625)_{10}=(101,0001)_2=(0,1010001)_2 \cdot 2^{(11)_2}
+\end{align*}
+Manche Zahlen wie $(0,3)_{10}$ lassen sich allerdings nur schwer als duale Zahlen darstellen.
+
+Die \textbf{größte darstellbare Zahl} ergibt sich zu:
+\begin{align*}
+x_{max}=(0,\underbrace{[B-1] [B-1] ... [B-1]}_\text{n Ziffern})_B \ B^M=B^M[B-1]\frac{B^{-n}(B^n-1)}{B-1}=B^M(1-B^{-n}).
+\end{align*}
+Dagegen ergibt sich die \textbf{kleinstmögliche Zahl} zu:
+\begin{align*}
+x_{min}=B^{m-1}
+\end{align*}
+Folglich ist die Menge der darstellbaren Maschinenzahlen endlich.
+Ergibt sich während der Rechnung eine Zahl $x>x_{max}$ folgt ein overflow und die Zahl wird auf $\infty$ gesetzt.
+In gleicher weise ergibt sich für $x<x_{min}$ der underflow und die Zahl wird auf 0 gesetzt.
+\textbf{Beispiele:}
+\begin{align}
+x_{max}+x_{max}=\infty \\
+x_{min} \ B^{-1}=0
+\end{align}
+Jede reelle Zahl die keine Maschinenzahl ist muss in eine solche umgewandelt werden. Idealerweise wählt man Maschinenzahl dabei möglichst nahe der reellen Zahl $\hat{=}$ Rundung.
+\subsubsection{Rundung}
+Beim Runden wird für eine Zahl $x$ eine Näherung $rd(x)$ unter den Maschinenzahlen geliefert, so dass der absolute Fehler $|x-rd(x)|$ minimal ist. Der dabei unvermeidbare Fehler heißt Rundungsfehler.
+Eine n-stellige Dezimalzahl im Gleitpunktformat $\tilde{x}=\pm(0,z_1 ... z_n)_{10}=rd(x)$ hat einen maximalen Fehler von:
+\begin{align*}
+|x-rd(x)| \leq 0,\underbrace{00...00}_\text{n Ziffern}5 \cdot 10^E=0,5 \cdot 10^{E-n}.
+\end{align*}
+Für eine allgemeine Basis B ergibt sich:
+\begin{align*}
+|x-rd(x)|\leq \frac{B}{2} \ \frac{1}{B}  \ B^{E-n}=\frac{1}{2}B^{E-n}.
+\end{align*}
+Rundungsfehler werden durch die gesamte Rechnung getragen.
+
+Bei einer \textbf{n-stellige Gleitpunktarithmetik}
+wird jede einzelne Rechenoperation auf $n+1$ Stellen genau berechnet und dann auf $n$ Stellen gerundet. Es wird also nicht nur das Endergebnis gerundet.\\
+\textbf{Beispiel:} $2590+4+4$ in \textit{3-stelliger dezimaler Gleitpunktarithmetik}\\
+Von links nach rechts:
+\begin{align*}
+2590+4=2594\underbrace{\Rightarrow}_\text{Rundung}2590\\
+2590+4=2594\underbrace{\Rightarrow}_\text{Rundung}2590\\
+\end{align*}
+Von rechts nach links:
+\begin{align*}
+4+4=8\underbrace{\Rightarrow}_\text{Rundung}8\\
+2590+8->2598\underbrace{\Rightarrow}_\text{Rundung}2600
+\end{align*}
+Das exakte Ergebnis wäre $2598$. 
+Die Reihenfolge der Ausführungen der Rechenoperationen verändert also das Ergebnis.
+Daraus folgt die \textbf{Regel}, dass beim \textbf{Addieren} die Summanden in der Reihenfolge ihrer aufsteigender Beträge addiert werden.
+So erhält man bei gleicher Rechenzeit bessere Ergebnisse.\\
+\\
+\textit{Einschub:Maß für die Rechenzeit eines Computers:\\
+$\text{flops} \hat{=} \text{floating point operations per second}$, dabei sind Multiplikation und Division typische Operationen.
+Eine Rangliste schnellsten Computer wird auf www.top500.org geführt.}\\
+\\
+Der \textbf{relative Fehler} ist meist relevanter als der absolute Fehler.
+Die Näherung $\tilde{x}$ zu dem exaktem Wert $x$ ergibt einen relativer Fehler: $\epsilon = |\frac{\tilde{x}-x}{x}| \approx |\frac{\tilde{x}-x}{\tilde{x}}|$.\\
+Daraus ergibt sich der maximaler Rundungsfehler zu: 
+\begin{align*}
+\epsilon_{max}=\frac{\frac{1}{2} \ B^{E-n}}{B^{E-1}}=\frac{1}{2} \ B^{1-n}
+\end{align*}
+%
+Für duale Rechnungen im Computer gilt also $B=2 \epsilon_{max} \cdot 2^{-n}$.\\
+$\epsilon_{max}$ wird auch \textbf{Maschinengenauigkeit} genannt und gibt die kleinste positive Zahl an für die gilt $1 \cdot \epsilon_{max} \neq 1$.\\
+$\epsilon_{max}$ kann aus Rechenoperationen rekonstruiert werden. 
+
+
+
+\end{document}
