@@ -194,7 +194,350 @@ Daraus ergibt sich der maximaler Rundungsfehler zu:
 %
 Für duale Rechnungen im Computer gilt also $B=2 \epsilon_{max} \cdot 2^{-n}$.\\
 $\epsilon_{max}$ wird auch \textbf{Maschinengenauigkeit} genannt und gibt die kleinste positive Zahl an für die gilt $1 \cdot \epsilon_{max} \neq 1$.\\
-$\epsilon_{max}$ kann aus Rechenoperationen rekonstruiert werden. 
+$\epsilon_{max}$ kann aus Rechenoperationen rekonstruiert werden.\\ 
+\\
+\textbf{Rundungsfehler bei Rechenoperationen}\\
+\textbf{Beispiele}: (mit 4er Mantissen und 1er Exponentenziffer, Dez.)\\
+\\
+\textit{Addition und Subtraktion von Zahlen mit stark unterschiedlichen Exponenten}:
+\begin{itemize}
+\item[Rundungsfehler kann verloren gehen:]$1234+0,5=\SI{0,1234e4}+\SI{0,5e0}=1235$.\\
+Fehler: $0,5$, rel. Fehler: $0,00040$, $\epsilon_{max}=\SI{0,5e-3}+\SI{0,5e0}=1235$, der Rundungsfehler ist also kleiner als der Maximale.
+\end{itemize}
+\textit{Multiplikation und Division:}
+\begin{itemize}
+\item[(underflow/overflow möglich):]
+$0,2 \cdot 10^{2} \cdot \SI{0,3e-6}=\SI{0,6e-12}=0$\\
+$0,2 \cdot 10^{-2} \cdot \SI{0,3e-6}=\SI{0,6e12}=\infty$ (Hier wäre der rel. Fehler $\infty$)
+\end{itemize}
+\textit{Fehler beim Assoziativgesetz:}
+\begin{itemize}
+\item[a)] $\SI{0,1111e-3}+(-0,1234+0,1234)=\SI{9,111e-3}+0,0009=\SI{0,10111e-2}=\SI{0,1011e-2})$
+\item[b)]$(-0,1234+0,1234= \SI{9,111e-3}+0,0009)+0,1243=-0,1233+0,1243=0,0010=0,100 \cdot 10^{-2}
+$\end{itemize}
+Der exakte Wert wäre aber: $0,10111 \cdot 10^{-2}$
+Daraus folgt:
+\begin{itemize}
+\item[a)]Fehler: $0,00001 \cdot 10^{-2}$, rel. Fehler: $0,01\%$
+\item[b)]Fehler: $0,00111 \cdot 10^{-2}$, rel. Fehler: $1 \%$
+\end{itemize}
+Im Fall b) ist also $\epsilon>\epsilon_{max}$.
+
+
+\subsubsection{Fehlerfortpflanzung bei Rechenoperationen}
+Fehler werden beim Rechnen weitergetragen, selten werden dabei die Fehler kleiner (meistens werden sie größer!).
+Durch das Umstellen von Formeln können Fehler minimiert werden, trotzdem müssen Fehler abgeschätzt werden. \\
+\\
+\textbf{Additionsfehler:}\\
+Gegeben: Fehlerbehaftete Größen $\tilde{x}$ und $\tilde{y}$ zu den Werten $x$ und $y$.\\
+Fehler der Summe: $\tilde{x}+\tilde{y}-(x+y)=(\tilde{x}-x)+(\tilde{y}-y)$\\
+Im ungünstigsten Fall addieren sich die Fehler: bei Additionen und Subtraktionen addieren sich die Absolutbeträge der Fehler der einzelnen Terme.\\
+\\
+\textbf{Multiplikation:}
+Fehler: $\tilde{x} \tilde{y}- x y=\tilde{x}(\tilde{y}-y)+\tilde{y}(\tilde{x}-x)-(\tilde{x}-x)(\tilde{y}-y)$,
+also hat das Produkt von $\tilde{y}$ mit einer Maschinenzahl ohne Fehler den $\tilde{x}$-fachen Fehler; Produkt der Fehler typischerweise vernachlässigbar.\\
+Der absolute Fehler eines Produkts ist gegeben durch das Produkt des Faktors mit dem Fehler des anderen Faktors. (=2 Terme, oft ist einer der Fehler dominant.)\\
+\\
+\textbf{Relativer Fehler Multiplikation:}\\
+\begin{align*}
+\frac{\tilde{x} \tilde{y}- x y}{\tilde{x \tilde{y}}}=\frac{\tilde{y}-y}{\tilde{y}}+\frac{\tilde{x}-x}{\tilde{x}}-\frac{(\tilde{x}-x)(\tilde{y}-y)}{\tilde{x} \tilde{y}},
+\end{align*} beim Multiplizieren addieren sich die relativen Fehler, Division analog.
+
+\subsubsection{Fehlerfortpflanzung bei Funktionen}
+Die Funktion wird an der Stelle $\tilde{x}$ anstatt $x$ ausgewertet, daraus folgt ein fehlerbehafteter Funktionswert.
+Je nach Funktion resultiert ein kleiner oder großer Fehler.
+Bei weiteren Funktionsauswertungen wird der Fehler typischerweise größer.\\
+Aus dem Mittelwertsatz folgt:
+\begin{align*}
+\int_x^{\tilde{x}}g(x')dx'=g(x_0)(\tilde{x}-x)\\
+\frac{\int_x^{\tilde{x}}g(x')dx'}{(\tilde{x}-x)}=g(x_0),
+\end{align*}
+an einer unbekannten Stelle $x_0$ im Intervall $(x,\tilde{x})$.\\
+Wähle $g(x)=f'(x)$:
+\begin{align*}
+|f(\tilde{x})-f(x))|=|\tilde{x}-x||f'(x_0)|.
+\end{align*}
+Der absolute Fehler vergrößert sich also für $|f'(x_0)|>1$ und wird für $|f'(x_0)|<1$ kleiner.
+Die Ableitung kann also als Verstärkungsfaktor des Fehlers interpretiert werden.\\
+\\
+
+\textbf{Abschätzung des absoluten Fehlers:}\\
+\begin{align*}
+|f(x)-f(\tilde{x})|\leq M \ |x-\tilde{x}|,
+\end{align*}
+mit $M=max_{x\leq x_0 \leq \tilde{x}} (|f'(x_0)|)$.
+Schätzung des Fehlers: $|f(x)-f(\tilde{x})| \approx f'(\tilde{x})|x-\tilde{x}|$.\\
+\\
+\textbf{Beispiel 1:}\\
+Fortpflanzung des absoluten Fehlers von $f(x)=sin(x)$:
+\begin{align*}
+f'(x)=cos(x) \rightarrow M=1,
+\end{align*}
+das heißt für die meisten Argumente verringert sich der absolute Fehler.\\
+\textbf{Beispiel 2:}
+\begin{align*}
+f(x)=\sqrt{x};f'(x)=\frac{0,5}{\sqrt{x}},
+\end{align*}
+divergiert also für $x \rightarrow 0$\\
+\\
+
+\textbf{Der relative Fehler bei Funktionsauswertung:}
+\begin{align*}
+\frac{|f(x)-f(\tilde{x}|)}{|f(x)|}\leq \frac{M |x|}{|f(x)|} \frac{|x-\tilde{x}|}{|x|}\\
+\approx \underbrace{\frac{|f'(\tilde{x})||\tilde{x}|}{|f(\tilde{x})|}}_{\textbf{Konditionszahl}} \cdot  \frac{|x-\tilde{x}|}{|\tilde{x}|}.
+\end{align*}
+Die Konditionszahl ist also ein Verstärkungsfaktor für relative Fehler;
+qualitativ: Probleme wenn Konditionszahl$>>$1 ;schlecht konditioniertes Problem.
+\section{Nullstellenproblem}
+Gegeben: Funktion $\mathbb{R} \rightarrow \mathbb{R}$\\
+Gesucht: Nullstellen also $x_0$ aus R mit $f(x_0)=0$
+Grundsätzlich:
+\begin{itemize}
+\item Gibt es überhaupt Nullstellen? Wenn ja, in welchem Bereich?
+\item Gibt es mehrere Lösungen?
+\end{itemize}
+
+\textbf{Zwischenwertsatz}\\
+$f:[a,b]\rightarrow R$, stetig für $C \in R$ mit $f(a) \leq c \leq f(b)$ gibt es ein $x_0 \in [a,b]$ so dass $f(x_0)=c$.\\
+Für $c=0$ ist dieser Satz bei der Nullstellensuche hilfreich. \\
+Suche Funktionswerte mit unterschiedlichem Vorzeichen: $f(a) \cdot f(b) < 0$.
+Dann gibt es zwischen $a$ und $b$ mindestens eine Nullstelle.
+
+\subsection{Bisektionsverfahren}
+\begin{align*}
+f(a) \cdot f(b)<0 \\
+\hat{=} \text{Nullstellen in } (a,b) 
+\end{align*}
+Berechne Vorzeichen von $f(\frac{a+b}{2})$ \\
+$\rightarrow$ $f(x)=0$ in $(a, \frac{a+b}{2})$ oder $(\frac{a+b}{2},b)$
+$\rightarrow$ Berechne Vorzeichen von $f(\frac{a+b}{4})$ oder $\frac{3}{4}(a+b)$...\\
+\\
+\textbf{Beispiel:}\\ \\
+$f(x)=x^3-x+0,3=0$\\
+Wie viele Nullstellen?
+\\
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+x & -2 & -1 & 0,5 & 1 \\ 
+\hline 
+f(x) & -5,7 & 0,3 & -0,075 & 0,3 \\ 
+\hline 
+\end{tabular} 
+\end{center}
+Wo sind die Nullstellen?\\
+Bestimme die Nullstelle zwischen $x=0$ und $x=0,5$ genau auf eine Stelle nach dem Komma.
+\begin{align*}
+f(0,25)>0 \rightarrow \text{Nullstelle in } [0,25;0,5]\\
+f(0,375)<0 \rightarrow \text{Nullstelle in } [0,25;0,375]\\
+f(0,3125)>0 \rightarrow \text{Nullstelle in } [0,3125;0,375]
+\end{align*}
+Also ist die Nullstelle bei $0,3...$.
+
+\subsection{Fixpunkt-Iteration}
+Eine Gleichung der Form $x^{n+1}=f(x^{(n)})$ wird als Fixpunktgleichung bezeichnet.
+Die Lösung(en) $\bar{x}$ mit $\bar{x}=f(\bar{x})$ heißen Fixpunkte. (da unter der Abbildung der Punkt $\bar{x}$ frei (=unveränderlich) bleibt.)
+Jedes Nullstellenproblem kann als eine solche Fixpunktgleichung definiert werden.\\
+\\
+\textbf{Beispiel:}\\
+Finde Nullstelle von $g(x)=x^3-x+0,3$.
+Umformen der Fixpunktgleichung: $x^3-x+0,3=0$:
+\begin{align*}
+x^3-x+0,3=0 \rightarrow x=x^3+0,3 \\
+\rightarrow x^{(n+1)}=(x^{(n)})^3+0,3
+\end{align*}
+
+Wir wählen zunächst Startwerte nahe der vermuteten Nullstellen ($\hat{=}$ Fixpunkten) und berechnen Werte für folgende n.\\
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+$n$ & $x^{(n)}$ & $x^{(n)}$ & $x^{(n)}$ \\ 
+\hline 
+0 & -1 & 0 & 1 \\ 
+
+1 & -0,7 & 0,3 & 1,3 \\ 
+
+2 & -0,043 & 0,327 & 2,497 \\ 
+
+3 & 0,2999 & 0,3349 & 15,87 \\ 
+
+4 & 0,327 & 0,337 &  \\ 
+
+8 & 0,33877 & 0,33891 &  \\ 
+\hline 
+\end{tabular} 
+\end{center}
+Die ersten zwei Startwerte konvergieren zum selben Fixpunkt.
+In der Tat ist nur der Fixpunkt $\bar{x}=0,3389...$ anziehend, die anderen werden als abstoßend bezeichnet.
+Der Kreuzungspunkt zwischen der linken und der rechten Seite der Gleichung liefert den Fixpunkt.\\
+Vergleich der Steigungen  von $y=x$ und $y=f(x)$ am Fixpunkt:\\
+Steigung von $f(x)$ ist kleiner als $x$, also $f'(x)<1 \rightarrow$ Grund für Konvergenz.
+Die Konvergenz ist also umso schneller je kleiner $f'(x)$ am Fixpunkt.\\
+\\
+\textbf{Fixpunktsatz:}\\ 
+Sei $f:[a,b]\rightarrow \mathbb{R}$ mit stetiger Ableitung $f'(x)$ und $\bar{x}$ ein Fixpunkt von $f$, dann gilt für die Iteration:
+\begin{align*}
+x^{(n+1)}=(x^{(n)})^3+0,3:
+\end{align*}
+ist $|f'(\bar{x})|<1$ so konvergiert $x^{(n)}$ gegen $\bar{x}$ falls $x^{(0)}$ nage genug an $\bar{x}$ liegt: $\bar{x}$ ist ein anziehender Fixpunkt.\\
+Ist $|f'(\bar{x})|>1$ so konvergiert $x^{(n)}$ für keinen Startwert $x^{(n)} nicht \bar{x} $. $\bar{x}$ ist dann ein abstoßender Fixpunkt.
+\\
+\\
+\textit{zurück zum Beispiel:}\\
+Plot der Funktionen und Kontrolle der Startpunkte.\\
+Die Fixpunkte sind $\bar{x_1}=-1,125$, $\bar{x_2}=0,3389$ und $\bar{x_3}=0,7864$.\\
+Plot der Abbildung $\rightarrow$ stabiler Punkt ablesbar.
+
+\subsection{Newton Verfahren}
+Gegeben: differenzierbare Funktion $f(x)$\\
+Gesucht: Nullstelle $\bar{x}$ mit $f(\bar{x})=0$\\
+Ausgangspunkt $x_0$ (in der Nähe von $\bar{x}$)\\
+\textbf{Lösung:}\\
+Linearisierung von $f(x)$ um $x_0$:\\
+$f(x) \approx f(x_0)+(x-x_0) \ f'(x_0) = 0$\\
+$f'(x_0) \neq 0$
+$\rightarrow x_0 - \frac{f(x_0)}{f'(x_0)}$\\
+Das heißt die Funktion $f(x)$ wird durch die Tangente am Pukt $x_0$ genähert. Verbesserungen sind im Prinzip möglich.\\
+Wird dieses Prinzip iterativ angewandt redet man vom Newton-Verfahren.
+\begin{align*}
+x_{n+1} =x_{n} - \frac{f(x_n)}{f'(x_n)}
+\end{align*}
+An unserem Beispiel ergibt sich:
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+$n$ & $x_n$ &  &  \\ 
+\hline
+0 & -1 & 0 & 1 \\ 
+
+1 & -1,15 & 0,3 & 0,85 \\ 
+
+2 & -1,12615 & 0,33699 & 0,7951 \\ 
+
+3 & -1,1254 & 0,3389 & 0,78668 \\ 
+
+4 & -1,12542 & 0,33894 & 0,78649 \\ 
+\hline 
+\end{tabular} 
+\end{center}
+Nach nur 4 Iterationen hat man eine Genauigkeit von $10^{-4}$ erreicht.
+Das Newton-Verfahren ist sehr schnell und beliebt; ein Nachteil liegt allerdings darin, dass in jedem Schritt eine Ableitung berechnet werden muss.\\
+\\
+\textbf{Lösung 1:} \textit{Das Vereinfachte Newton-Verfahren}\\
+Statt in jedem Schritt $f'(x_n)$ zu berechnen wird immer wieder $f'(x_0)$ verwandt:
+\begin{align*}
+x_{n+1}=x_n-\frac{f(x_n)}{f'(x_0)}
+\end{align*}
+Allerdings konvergiert dieser Ansatz nicht so schnell.\\
+\\ 
+\textbf{Lösung 2:} \textit{Sekantenverfahren} \\
+Statt der Steigung im Punkt $x_n$ wird die Aleitung durch Differenzenbildung berechnet:
+\begin{align*}
+x_2=x_1-\frac{f(x_1) \ (x_1-x_0)}{f(x_1)-f(x_0)} \\
+\rightarrow x_{n+1}=x_n-\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})} \cdot f(x_n)
+\end{align*}
+Hier wird also ebenfalls keine Ableitung benötigt; allerdings werden zwei Startwerte benötigt.
+Die Konvergenzgeschwindigkeit ist nicht ganz so gut wie beim Newton-Verfahren, allerdings ist der Rechenaufwand gering. (In jedem Schritt muss nur eine Funktionsauswertung vorgenommen werden.)
+Im Allgemeinen ist das Sekantenverfahren besser als das Newton-Verfahren.
+
+\subsection{Konvergenzkriterien}
+Die Effizienz von Nullstellensuche hängt von der Konvergenzgeschwindigkeit ab. \\
+\textbf{Definition:} Sei $x_n$ eine Folge mit $lim_{n \rightarrow \infty}=\bar{x}$, dann hat die Folge eine Konvergenzordnung $q \geq 1$ wenn es die Konstante $c>0$ gibt mit:
+\begin{align*}
+|x_{n+1}| \leq c \ |x_n-\bar{x}|^q \text{für alle n}
+\end{align*}
+Für $q=1$ muss auch $c<1$ gelten.
+Aus $q=1$ folgt die lineare Konvergenz aus $q=2$ die quadratische.\\
+\\
+\textbf{Beispiel:}\\
+Sei $x_n$ eine lineare, konvergente Folge und $y_n$ eien quadratisch, konvergente Folge mit den Grenzwerten $x_n$ und $\bar{x}$.
+Wir starten mit dem gleichen Abstand zur NS: $|x_n-\bar{x}|\leq 0,1$, $|y_n-\bar{x}|\leq 0,1$.
+Im nächsten Schritt: $|x_{n+1}-\bar{x}| \leq c \cdot 0,1$ und $|y_{n+1}-\bar{x}| \leq c \cdot 0,01$.
+Das quadratische Verfahren konvergiert also deutlich schneller.\\
+Bemerkung: Für einfache Nullstellen konvergiert das Newtonverfahren quadratisch, das Sekantenverfahren mit $q=\frac{\sqrt{5}+1}{2}$ und das vereinfachte Newton-Verfahren linear.
+
+Außerdem lässt sich für mehrfache Nullstellen das Newton-Verfahren verbessert werden und eine quadratische Konvergenz erreicht werden:
+\begin{align*}
+x_{n+1}=x_n + n \ \frac{f(x_n)}{f'(x_n)},
+\end{align*}
+wobei $m$ die Vielfachheit der Nullstelle beschreibt.
+
+Cave: numerische Auslöschung bei $f'(x_n) \approx 0$.
+
+\subsection{Zusammenfassung}
+\begin{itemize}
+\item[Bisektion:] Einfaches Verfahren, schlechte Konvergenz, Fehler halbiert sich mit jedem Iterationsschritt.
+Allerdings wird dieses Verfahren häufig verwendet um die Nullstelle einzugrenzen und dann ein Verfahren mit besserer Konvergenz zu nutzen.
+\item[Fixpunktiteration:]Linearkonvergenz bei anziehenden Nullstellen, aber Vorsicht bei abstoßenden Nullstellen.
+Diese Methode ist allerdings einfach anzuwenden und numerisch günstig, da immer nur eine Rechenoperation ausgeführt werden muss.
+\item[Newton-Verfahren:] Quadratische Konvergenz bei einfachen Nullstellen, allerdings die die Berechnung aufwendig, da ABleitungen gebildet werden müssen.
+Ein Vorteil ist die Möglichkeit der Anwendung auf mehrdimensionale Probleme, allerdings benötigt dann jede Iteration die Lösung eines linearen Gleichungssystems.
+\item[Vereinfachtes Newton-Verfahren:]Weniger Rechenaufwand, da die Ableitung nicht neu berechnet werden muss allerdings nur lineare Konvergenz.
+\item[Sekantenverfahren:] Eine relativ gute Konvergenz mit $q\approx 1,618$ und auch gute numerische Effizienz, da nicht die Ableittung sondern die Differenzenquotient genutzt wird. Allerdings muss die Auslöschung bei Nullstellen beachtet werden: $\frac{f(x_n)}{f'(x_n)} \approx \frac{0}{0}$.
+\end{itemize}
+
+\section{Lineare Gleichungssysteme}
+WIr betrachten ein Gleichungssystem $a_{11} x_1+a_{12} x_2+...+a_{1n} x_n=b_1$, $a_{21} x_1+a_{22} x_2+...+a_{2n} x_n=b_2$ und $a_{31} x_1+a_{32} x_2+...+a_{3n} x_n=b_3$. Ein solches Gleichungssytem ist exakt lösbar wenn die Anzahl der unabhängigen Gleichungen gleich der Anzahl der Unbekannten ist. 
+Die Lösung von größeren Gleichungssystem erfordert numerische Verfahren, dabei unterscheidet man zwischen zwei verschiedenen Klassen.
+\begin{itemize}
+\item[Direkte Verfahren:] In einer endlichen Anzahl von Schritten erhält man die exakte Lösung im Rahmen der numerischen Genauigkeit.
+\item[Iterative Verfahren:] Hier wird eine Folge $b_k$ von Lösungsvektoren erzeugt die gegen b konvergiert.
+\end{itemize}
+
+\subsection{Gauß-Verfahren}
+Ein Gleichungssystem der Form $\begin{pmatrix}
+a_{11} & a_{12} & ... & a_{1n} \\
+0 & a_{22} & ... & a_{2n} \\
+. & .\\
+. & .\\
+. & .\\
+0 & 0 & ... & a_{nn}
+\end{pmatrix}	\begin{pmatrix}
+x_1 \\ x_2 \\. \\ . \\ . \\x_n  
+\end{pmatrix}=\begin{pmatrix}
+b_1 \\ b_2 \\. \\. \\. \ \\x_n  
+\end{pmatrix}$
+
+Um eine beliebige Matrix auf diese dieser Form zu bringen können die Zeilen einzeln durch elementare Zeilenoperationen umgeformt werden:
+\begin{align*}
+z_j=z_j-\frac{a_{ji}}{a_{ii}},
+\end{align*}
+für Spalte $i$ und Zeile $j$ mit $i=1,..,n$ und $j=i+1,...,n$.
+
+Das Ergebnis lässt sich dann durch Rückeinsetzung lösen.\\
+Bemerkung: DIe Anzahl der benötigten Schritte wächst beim Gauß-Verfahren kubisch mit der Größe des LGS $n$: $\sigma(n^3)$.\\
+\\
+\textbf{Beispiel: Fehlerminimierung mit Pivotisierung}
+$A= \begin{pmatrix}
+-16^{-4} & 1 \\
+2 & 1 
+\end{pmatrix}$ und $b=\begin{pmatrix}
+1 \\ 0
+\end{pmatrix}$, wir rechnen in 4-stelliger Dezimalgenauigkeit.
+Aus dem Gauß-Algorithmus folgt dann:
+\begin{align*}
+z_2=[0,20000+1,20000]
+\end{align*}
+Beim Rückeinsetzen ergibt sich dann:
+\begin{align*}
+x_2=\frac{20000}{20000+1} \approx 1 \\
+x_1=\frac{1}{-10^{-4}} \cdot (1-1) =0.
+\end{align*}
+Die exakten Lösungen wären allerdings $x_1=-0,499975$ und $x_2=0,99995$.
+
+Um einen kleineren Fehler zu erhalten werden zunächst die erste und die zweite Zeile getauscht. Daraus ergibt sich dann:
+\begin{align*}
+z_2=[-10^{-4+10^{-5}} \approx 0,1+0,5\ 10^{-4} \approx 1, 1+0]\\
+x_2=1 \\
+x_1=- \frac{1}{2}.
+\end{align*}
+\textbf{Satz:} Der Fehler im Gauß-Verfahren wird durch die sogenannte \textit{Spaltenpivotisierung} minimiert. Dabei werden vor jedem Eliminationsschritt für die i-te Spalte die Zeilen des LGS so umsortiert, dass gilt:
+\begin{align*}
+|a_{ii}|= \text{max}\{|a_{ij}|, j=1,...n \}.
+\end{align*}
+Dann gilt im Eliminationsschritt für den Fehler. $|\frac{a_{ji}}{a_{ii}}|\leq 1$.
+Dann wird der Gauß-Algorithmus für die Spalte i angewandt und für $i+1$ erneut aufdas betragsmäßig größte Element in den Zeilen $j=i+1,...n$
+geprüft
 
 
 

@@ -5,3 +5,13 @@
 \contentsline {subsection}{\numberline {1.3}Rundungsfehler}{3}
 \contentsline {subsubsection}{\numberline {1.3.1}Gleitpunktarithmetik}{4}
 \contentsline {subsubsection}{\numberline {1.3.2}Rundung}{5}
+\contentsline {subsubsection}{\numberline {1.3.3}Fehlerfortpflanzung bei Rechenoperationen}{7}
+\contentsline {subsubsection}{\numberline {1.3.4}Fehlerfortpflanzung bei Funktionen}{8}
+\contentsline {section}{\numberline {2}Nullstellenproblem}{9}
+\contentsline {subsection}{\numberline {2.1}Bisektionsverfahren}{9}
+\contentsline {subsection}{\numberline {2.2}Fixpunkt-Iteration}{10}
+\contentsline {subsection}{\numberline {2.3}Newton Verfahren}{11}
+\contentsline {subsection}{\numberline {2.4}Konvergenzkriterien}{12}
+\contentsline {subsection}{\numberline {2.5}Zusammenfassung}{12}
+\contentsline {section}{\numberline {3}Lineare Gleichungssysteme}{13}
+\contentsline {subsection}{\numberline {3.1}Gau\IeC {\ss }-Verfahren}{13}
