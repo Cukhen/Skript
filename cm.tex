@@ -12,10 +12,11 @@
 \usepackage[locale = DE]{siunitx}
 \usepackage{rotating}
 \counterwithin{equation}{section}
+\usepackage{listings}             % Include the listings-package
+\lstset{language=Pascal}   
 
 \begin{document}
-\title{Computergestüzte Methoden der exakten Naturwissenschaften}
-\author{Mitschrieb der Vorlesung, gehalten von Prof. Dr. Roland Netz}           
+\title{Computergestüzte Methoden der exakten Naturwissenschaften}           
 \maketitle
 \tableofcontents
 \newpage
@@ -536,8 +537,101 @@ x_1=- \frac{1}{2}.
 |a_{ii}|= \text{max}\{|a_{ij}|, j=1,...n \}.
 \end{align*}
 Dann gilt im Eliminationsschritt für den Fehler. $|\frac{a_{ji}}{a_{ii}}|\leq 1$.
-Dann wird der Gauß-Algorithmus für die Spalte i angewandt und für $i+1$ erneut aufdas betragsmäßig größte Element in den Zeilen $j=i+1,...n$
-geprüft
+Dann wird der Gauß-Algorithmus für die Spalte i angewandt und für $i+1$ erneut auf das betragsmäßig größte Element in den Zeilen $j=i+1,...n$
+geprüft.
+
+\subsection{LR(LU)-Zerlegung}
+Möchte man mehrere LGS mit der selben Koeffizientenmatrix aber anderer rechten Seite lösen so empfiehlt es sich die Elementaren Umformungen zu merken. \\ 
+Für $A= \begin{pmatrix}
+1  & 2 & 3\\
+6  & -2 & 2\\
+-3  &1 & 4
+\end{pmatrix}$
+führten wir durch:\\
+\begin{align*} 
+ z_2=z_2-6z_1 \rightarrow L_1=\begin{pmatrix}
+1  & 0 & 0\\
+-6  & 1 & 0\\
+0  &0 & 1
+\end{pmatrix} \\
+z_3=z_3+3z_1 \rightarrow L_2=\begin{pmatrix}
+1  & 0 & 0\\
+0  & 1 & 0\\
+3  &0 & 1 
+\end{pmatrix} \\
+z_3=z_3+\frac{1}{2} z_2 \rightarrow L_1=\begin{pmatrix}
+1  & 0 & 0\\
+0  & 1 & 0\\
+0  &\frac{1}{2} & 1
+\end{pmatrix}.
+\end{align*}
+
+Daraus folgt dann:
+\begin{align*}
+L=L_3 \ (L_2 \cdot L_1)=\begin{pmatrix}
+1  & 0 & 0\\
+-6  & 1 & 0\\
+0  &\frac{1}{2} & 1
+\end{pmatrix}.
+\end{align*}
+Damit ergibt sich dann die rechts-obere Dreiecksmatrix R zu:
+\begin{align*}
+R=L(A)
+\end{align*}
+So lässt sich dann für ein beliebiges LGS $A \ x = c$ der Lösungsvektor aus $L(c)$ berechne denn da die linke Seite von
+\begin{align*}
+R=L(c)
+\end{align*}
+bereits eine rechts-obere Dreiecksmatrix ist kann die Gleichung direkt durch Rückeinsetzen gelöst werden. \\
+\\
+\textbf{Satz} Für jede $nxn$-Matrix, für die der Gauß-Algorithmus ohne Zeilenvertauschungen durchführbar ist, gibt es $nxn$-Matrizen $L$ und $R$ mit den Eigenschaften:
+\begin{itemize}
+\item $L$ ist eine links-untere Dreiecksmatrix mit $l_{22}$ für $i=1,...,n$
+\item R ist eine rechts-obere Dreiecksmatrix mit $r_{22} \neq 0$ für $i=1,...,n$
+\item $A=L^{-1} \ R$ bezeichnet man als LR-Zerlegung von $A$. 
+\end{itemize}
+Es gilt:
+\begin{align*}
+A \ x = b \Leftrightarrow L b = y \quad \text{und} \quad R x =y
+\end{align*}
+\subsection{Cholesky-Zerlegung}
+\textbf{Definition:} Eine symmetrische $n x n$-MatrixA heißt positiv-definit wenn gilt:
+\begin{align*}
+x^T Ax>0
+\end{align*}
+\textbf{Satz}Für jede positiv-definite Matrix $A$ gibt es genau eine rechts-obere Dreiecksform mit $r_{ii}>0 \quad \text{für} \quad 1,...,n$
+und $A=R^TR$, diese Zerlegung nennt man Cholesky-Zerlegung. 
+
+Die Berechnung der Zerlegung erfolgt wie folgt:\footnote{http://de.wikipedia.org/wiki/Cholesky-Zerlegung\#Pseudocode} 
+\begin{lstlisting}[frame=single]
+
+
+    For i = 1 To n
+        For j = 1 To i
+            Summe = a(i, j)
+            For k = 1 To j-1
+                Summe = Summe - a(i, k) * a(j, k)
+            If i > j Then
+                a(i, j) = Summe / a(j, j)   
+            Else If Summe > 0 Then          
+                a(i, i) = Sqrt(Summe)       
+            Else
+                ERROR                       
+\end{lstlisting}
+
+Damit ergibt sich für $A=\begin{pmatrix}
+4 & 4 & 2 \\
+4 & 5 & 5 \\
+4 & 5 & 26 \\
+\end{pmatrix}$, $R=\begin{pmatrix}
+2 & 2 & 1 \\
+0 & 1 & 3 \\
+0 & 0 & 4 \\
+\end{pmatrix}$.\\
+\textbf{Bermerkung} Der numerische Aufwand des Verfahrens beträgt $(\frac{1}{6} n^3 + \frac{1}{2} n^2 -\frac{2}{3} n)$ und ne Wurzelberechnungen.
+Das Gauß-Verfahren benötigt$(\frac{n^3}{3}+\frac{n}{3})$, ist also für $n \geq 2 $ langsamer.
+
+
 
 
 
