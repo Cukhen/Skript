@@ -266,7 +266,7 @@ Die Ableitung kann also als Verstärkungsfaktor des Fehlers interpretiert werden
 \begin{align*}
 |f(x)-f(\tilde{x})|\leq M \ |x-\tilde{x}|,
 \end{align*}
-mit $M=max_{x\leq x_0 \leq \tilde{x}} (|f'(x_0)|)$.
+mit $M=\underset{x\leq x_0 \leq \tilde{x}} {max} (|f'(x_0)|)$.
 Schätzung des Fehlers: $|f(x)-f(\tilde{x})| \approx f'(\tilde{x})|x-\tilde{x}|$.\\
 \\
 \textbf{Beispiel 1:}\\
@@ -628,11 +628,587 @@ Damit ergibt sich für $A=\begin{pmatrix}
 0 & 1 & 3 \\
 0 & 0 & 4 \\
 \end{pmatrix}$.\\
-\textbf{Bermerkung} Der numerische Aufwand des Verfahrens beträgt $(\frac{1}{6} n^3 + \frac{1}{2} n^2 -\frac{2}{3} n)$ und ne Wurzelberechnungen.
+\textbf{Bermerkung} Der numerische Aufwand des Verfahrens beträgt $(\frac{1}{6} n^3 + \frac{1}{2} n^2 -\frac{2}{3} n)$ und eine Wurzelberechnungen.
 Das Gauß-Verfahren benötigt$(\frac{n^3}{3}+\frac{n}{3})$, ist also für $n \geq 2 $ langsamer.
 
+\subsubsection{Fehlerrechnung bei LGSW}
+WIr wollen untersuchen wie sich Fehler in einem LGS auf dessen Lösung auswirken, dazu benötigen wir ein Maß.
+\textbf{Definition:} Eine Abbildung $||\ ||: \mathbb{R}^n \rightarrow \mathbb{R}$ heißt Vektornorm, wenn für alle $x,y \in \mathbb{R}^n$ und alle $\lambda \in \mathbb{R}$ gilt:
+
+\begin{itemize}
+\item $||x|| \geq 0$ und $||x||=0$ wenn $x=0$
+\item $|| \lambda x|| = |\lambda| ||x||$
+\item $||x+y|| \leq ||x||+||y||$
+\end{itemize}
+
+Beispiele hierfür sind Summennorm, Maximunmnorm und die euklidische Norm.
+Diese sind äquivalent wenn gilt:...\\
+
+Entsprechend lassen sich auch Matrixnormen definieren: Spaltensummennorm Spektralnorm, Zeilensummennorm.
+
+\textbf{Bemerkung:} Matrixnormen erfüllen die Eigenschaften der zugrundliegenden Vektornormen, insbesondere auch die Äquivalenz:
+\begin{align*}
+||A x||_v \leq ||A||_v||x||_v,
+\end{align*}
+man sagt dann: die Norm ist kompatibel.\\
+\textbf{Satz} Sei $|| \ ||$ eine Norm und A eine reguläre $nxn$ Matrix und:$A \ x=b$ und $A \ x' =b'$
+
+Dann gilt:
+\begin{align*}
+A(x-x')=b-b' \\
+x-x'=A^{-1}(b-b')\\
+||x-x'|| \leq ||A^{-1}|| \ |b-b'|.
+\end{align*}
+Und ensprechend mit der MUltiplikation von $||A|| ||x|| \geq ||b|| \rightarrow ||\frac{1}{x}|| \leq \frac{||A||}{||b||}$:
+\begin{align*}
+\frac{||x-x'||}{||x||} \leq ||A|| ||A^{-1}|| \cdot \frac{||b-b'||}{||b||}.
+\end{align*}
+Man nennt $||A|| \ ||A^{-1}||=cond(A)$ die Konditionszahl der Matrix $A$ bzgl. der verwendeten Norm. \\
+\textbf{Bermerkung:} Die Koordinationszahl gibt also die max. Verstärkung des relativen Fehleran, währen $||A^{-1}||$ die maximale Verstärkung des absoluten Faktors ist.\\
+\textbf{Satz:} Ist nicht nur die rechte Seite eines LGS fehlerbehaftet, sondern auch die Koeffizientenmatrix, so gilt für die Lösungen der beiden LGS $A \ x = b$ und $A' \ x' = b'$ mit $\Delta A= A-A'$ und $\Delta x= x-x'$
+\begin{align*}
+\frac{||\Delta x||}{||x||} \leq \frac{cond(A)}{1-cond(A) \frac{||\Delta|A|}{A}}   (norm( deltA(A + norm( deltab/b)
+\end{align*}
+
+\subsection{Iterative Verfahren}
+\textbf{Idee:} Das Linerares Gleichungssystem $A x=b$ ist äquivalent zu einem vektoriellen Nullstellenproblem:
+\begin{align*}
+Ax-b=0.
+\end{align*}
+Anstelle des Nullstellenproblems betrachtet man dann das Fixpunktproblem.
+Um auf der rechten Seite der Matrix ein $x$ zu erzeugen muss die Matrix zerlegt werden: $A=I+A-I$, mit der Einheitsmatrix $I$. Daraus folgt:
+\begin{align*}
+0=(I+A-I)x-b \Rightarrow I x=(I-A)x+b\\
+\Rightarrow x=(I-A)x+b.
+\end{align*}
+Dies entspricht dann einer vektoriellen Fixpunktgleichung, welche als Iterationsgleichung aufgefasst werden kann.
+
+Mit einem Startwer $x^{(0)}$ folgt damit:
+\begin{align*}
+x^{(1)}=(I-A)x^{(0)}+b, \\
+x^{(n+1)}=(I-A)x^{(n)}+b.
+\end{align*}
+Ein Fixpunkt der Itertaionsgleichung einspricht dann also der Lösung des LGS.
+
+\textbf{Beispiel:}\\
+Aus $A=\begin{pmatrix}
+4 & -1 & 1 \\
+-2 & 5 & 1 \\
+1 & -2 & 5 \\
+\end{pmatrix}$, 
+$b=\begin{pmatrix}
+5\\
+11 \\
+12\\
+\end{pmatrix}$ folgt:
+$x^{(n+1)}=\begin{pmatrix}
+-3 & 1 & -1 \\
+2 & -4 & -1 \\
+-1 & 2 & -4 \\
+\end{pmatrix} x^{(n)}+
+\begin{pmatrix}
+5\\
+11 \\
+12\\
+\end{pmatrix} $,
+was nicht konvergiert.
+
+\subsection{Jacobi Verfahren(Gesamtschnitt)}
+Betrachte Zerlegung $A=\underbrace{\begin{pmatrix}
+0 & 0 & 0 & .\\
+a_{21} & 0 & 0 & . \\
+a_{31} & a_{32} & 0 & .\\
+.&.&.&.
+\end{pmatrix}}_L+ \underbrace{\begin{pmatrix}
+a_{11} & 0 & 0 & .\\
+0 & a_{22} & 0 & . \\
+0 & 0 & a_{33} & .\\
+.&.&.&.
+\end{pmatrix}}_D+
+\underbrace{\begin{pmatrix}
+0 & a_{12} & a_{13} & .\\
+0 & 0 & a_{23} & . \\
+0& 0 & 0 & .\\
+.&.&.&.
+\end{pmatrix}}_R$.
+Daraus ergibt sich dann:
+\begin{align*}
+Ax-b=0=(L+D+R)x-b\\
+\Rightarrow Dx=-(L+R)x+b \\
+\Rightarrow x=-D^{-1}(L+R)x+D^{-1}b \\
+\Rightarrow x^{(n+1)}=-D^{-1}(L+R)x^{(n)}+D^{(-1)}b
+\end{align*}
+Dies liefert für unser Beispiel von vorher:
+\begin{align*}
+x^{(n+1)}=\begin{pmatrix}
+0 & 0,25 & -0,25 \\
+0,4 & 0 & -0,2 \\
+-0,2 & 0,4 & 0 \\
+\end{pmatrix}x^{(n)}+\begin{pmatrix}
+1,25\\
+2,2\\
+2,4
+\end{pmatrix}.
+\end{align*}
+Dies liefert dann:
+\begin{tabular}{c|cccccc}
+
+$i$ & 0 & 1 & 2 & 3 & 4 & 5 \\ 
+\hline 
+$x^{(i)}$ & 0 & 1,25 & 1,2 & 1,0475 & 1,0065 & 0,9973 \\ 
+ 
+& 0 & 2,2 & 2,22 & 2,074 & 2,0094 & 1,9986 \\ 
+
+& 0 & 2,4 & 3,03 & 3,048 & 3,0201 & 3,0024 \\ 
+
+\end{tabular} 
+
+dies konvergiert gegen: $\bar{x}=\begin{pmatrix}
+1\\
+2\\
+3
+\end{pmatrix}$.
+
+\subsubsection{Einzelschrittverfahren (Gauß-Seidel Verfahren)}
+Jacobi-Verfahren in Komponenten:
+\begin{align*}
+x_1^{(n+1)}=0,25 x^{(n)}_2-0,25 x^{(n)}_3 +1,25\\
+x_2^{(n+1)}=0,4 x^{(n)}_1-0,2 x^{(n)}_3 +2,2\\
+x_3^{(n+1)}=-0,2 x^{(n)}_1+0,4 x^{(n)}_2 +2,4.
+\end{align*}
+Wenn man annimmt, dass $x^{(n+1)}$ komponentenweise näher am Lösungsvekotr liegt, sollte man in der zweiten Gleichung $x_1^{n+1}$ u.s.w. benutzen, damit ergibt sich:
+\begin{align*}
+x_1^{(n+1)}=0,25 x^{(n)}_2-0,25 x^{(n)}_3 +1,25\\
+x_2^{(n+1)}=0,4 x^{(n+1)}_1-0,2 x^{(n)}_3 +2,2\\
+x_3^{(n+1)}=-0,2 x^{(n+1)}_1+0,4 x^{(n+1)}_2 +2,4.
+\end{align*}
+In Matrix Schreibweise:
+\begin{align*}
+x^{(n+1)}=\begin{pmatrix}
+0 & 0,25 & -0,25\\
+0& 0 & -0,2\\
+0& 0 & 0
+\end{pmatrix} x^{(n)}+
+\begin{pmatrix}
+0 & 0 & 0\\
+0,4& 0 & -0\\
+-0,2& 0,4 & 0
+\end{pmatrix} x^{n+1}+
+\begin{pmatrix}
+1,25\\
+2,2\\
+2,4
+\end{pmatrix},
+\end{align*}
+oder einfacher:
+\begin{align*}
+x^{(n+1)}=-D^{-1}(R x^{(n)}+L x^{(n+1)}-b)\\
+\Leftrightarrow (D+L)x^{(n+1)}=-R x^{(n)}+b\\
+\Leftrightarrow x^{(n+1)}=-(D+L)^{-1} R x^{(n)}+(D+L)^{-1} b.
+\end{align*}
+In der Praxis wird nicht das Inverse der Matrix $(D+L)$ berechnet, sondern das Gleichungssystem $(D+L)x^{(n+1)}=-R x^{(n)}+b$ wird gelöst(durch Vorwärtseinsetzen).\\
+Zurück zum Beispiel:
+\begin{tabular}{c|ccccc} 
+ & 0 & 1 & 2 & 3 & 4 \\ 
+\hline 
+ & 0 & 1,25 & 1,1175 & 1,006 & 1,001 \\ 
+ 
+ & 0 & 2,7 & 2,001 & 2,007 & 2,0002 \\ 
+
+ & 0 & 3,24 & 2,977 & 3,002 & 2,9998 \\ 
+
+\end{tabular},
+konvergiert also schneller.\\
+\subsubsection*{Konvergenz von linearen Iterationsverfahren} 
+Gegeben sei eine lineare Matrix-Fixpunkt-Iterationsgleichung $x^{n+1}=B x^{(n)}+b$, wobei B eine $m x m$ Matrix, $b \in \mathbb{R}^m$ und $\bar{x}$ ein Fixpunkt mit: $\bar{x}= B \bar{x}+ b$.\\
+Sei $|| . ||$ eine Matrixnorm, dann gilt: \\
+$\bar{x}$ anziehender Fixpunkt falls $||B|| < 1$\\
+$\bar{x}$ abstoßender Fixpunkt falls $||B|| > 1$\\
+\\
+\textbf{Matrix-Fixpunktsatz für anziehenden Fixpunkt:} Fixpunktiteration konvergiert für alle Startwerte.\\
+\textit{Bemerkungen:} F+r Gesamtschrittverfahren (Jacobi) gilt \textit{$B=-D^{-1}(L+R)$}. Für die $\infty$-Norm (Zeilensummennorm)gilt:
+\begin{align*}
+||B||_{\infty}=max_{i,m} \sum_{j \neq i} \frac{|a_{ij}|}{|a_{ii}|}=max_{i,m} \frac{1}{|a_{ii}|} \sum_{j \neq i} |a_{ij}|<1\\
+\Leftrightarrow |a_{ii}|>\sum_{j \neq i} |a_{ij}|,
+\end{align*}
+für alle $i$, dies wird Zeilensummenkriterium genannt.
+Eine solche Matrix heißt diagonaldominant.
+
+Im Einzelschrittverfahren ist $B=-(D+L)^{-1} R$ und man kann zeigen, dass $||(D+L)^{-1}R||_{\infty} \leq ||D^{-1}(L+R)||_{\infty}$.
+Konvergiert also das Gesamtschrittverfahren so konvergiert auch dasd Einzelschrittverfahren, die Umkehrung gilt nicht.
+
+\subsection{Nichtlineare Gleichungssyteme-Newton Verfahren}
+häufig: $n$ nicht-lineare Gleichungen mit $n$ Unbekannten\\
+gegeben: vektorielle Funktion  $f:\mathbb{R}^n \rightarrow \mathbb{R}^n$\\
+gesucht: Vektor $\bar{x} \in \mathbb{R}^n$ mit $f(\bar{x})=0$.\\
+$f(x)=f(x_1,...,x_n)= \begin{pmatrix}
+f_1(x_1,...,x_n) \\
+f_2(x_1,...,x_n) \\
+...\\
+f_3(x_1,...,x_n)
+\end{pmatrix}= \begin{pmatrix}
+0\\
+0\\
+...\\
+0
+\end{pmatrix}
+$.
+Es gibt kein einfaches Verfahren um zu prüfen ob ein Gleichungs-System lösbar ist und wieviele Lösungen es gibt.
+$\rightarrow$ verallgemeinere Newton-Verfahren auf $n$-Dimensionen.
+\begin{align*}
+g: \mathbb{R} \rightarrow \mathbb{R} \Rightarrow g(x) \approx g(x_0)+ (x-x_0)g'(x_0)=0\\
+f: \mathbb{R}^n \rightarrow \mathbb{R}^n \Rightarrow f(x) \approx g(x^{(0)})+ (x-x^{(0)})D(f(x^{(0)}))=0
+\end{align*}
+Zu lösen ist also das Gleichungssystem:
+\begin{align*}
+x=x^{(0)}-(D(f(x^{(0)})))^{-1} f(x^{(0)}) \\
+x^{(n+1)}=x^{(n)}-(D(f(x^{(n)})))^{-1} f(x^{(n)}).
+\end{align*}
+Dies wird als Newton-Verfahren bezeichnet.
+
+\subsubsection*{Jacobi Matrix}
+Die Jacobi Matrix der partiellen Ableitungen ist definiert als:
+\begin{align*}
+D(f(x))=\frac{\partial f_i(x)}{\partial x_j}=\begin{pmatrix}
+\frac{\partial f_1(x)}{\partial x_1} & \frac{\partial f_1(x)}{\partial x_2} & ... & \frac{\partial f_1(x)}{\partial x_n} \\
+.\\
+.\\
+.\\
+\frac{\partial f_n(x)}{\partial x_1} & ... & & \frac{\partial f_n(x)}{\partial x_n} 
+\end{pmatrix}.
+\end{align*}
+So ergibt sich mit $f(x_1,x_2)= \begin{pmatrix}
+2 x_1 + 4 x_2 \\ 4 x_1++ 8x_2^3
+\end{pmatrix}$ und $x^{(0)}= \begin{pmatrix}
+4 \\ 2
+\end{pmatrix}$ $\bar{x}= \begin{pmatrix}
+-2 \\
+1
+\end{pmatrix}$
+
+\textbf{Satz:} Das Newton Verfahren konvergiert quadratisch wenn:
+\begin{itemize}
+\item $x^{(0)}$ nahe genug an $\bar{x}$ liegt
+\item $D(f(\bar{x}))$ regulär ist
+\item $f$ dreimal stetig differenzierbar ist
+\end{itemize}
+
+\textbf{Achtung:} Nicht immer konvergiert das Newton Verfahren gegen eine Nullstelle. Ein Beispiel hierfür ist die Funktion: $f= \begin{pmatrix}
+x_1^3 -x_2 -1 \\
+x_1^2-x_2
+\end{pmatrix}$.
+Die liegt daran, dass die zugehörige Jacobi-Matrix nicht regulär (nicht invertierbar) ist.
+
+\textbf{Bemerkung:} in der Praxis werden partielle Ableitungen durch Differenzieren angenähert: $D(f(x))_{i j}=\frac{f_i(x+h \ e_j)- f_i(x)}{h}$,
+mit dem Einheitsvektor in $j$-Richtung $e_j$.
 
 
+\subsubsection*{Vereinfachtes Newton-Verfahren}
+Der Rechenaufwand pro Schritt wird dadurch minimiert, dass stets $D(f(x^{(0)}))$ benutzt wird, dadurch ist die Konvergenz nur noch linear.
+
+\section{Interpolation und Ausgleichsrechnung}
+In vielen Anwendungen: Messdaten sollen durch eine Formel beschrieben werden, zum Beispiel um Integrale, Differentiale, etc. zu berechnen.\\
+\textbf{Definition:} gegeben seien $n+1$ Wertepaare $(x_1, f_i)$ mit $i=(0,...,n)$; gesuchten stetigen Funktionen $f(x)$ mit $f(x_i)=f_i$ für alle $i=0,..,n$.\\
+$\{x_n\}$: Stützstellen, $\{f_n\}$: Stützwerte; $\{x_n, f_n\}$ Stützpunkte und $f(x)$ Interpolierende der Stützpunkte.\\
+\textbf{Bemerkung:} Das Interpolationsproblem ist nicht eindeutig.
+
+\subsubsection{Polynom-Interpolation}
+Ein Polynom $n$-ten Grades besitzt $n+1$ Freiheitsgrade, es ist also möglich die $n+1$ Koeffizienten des Polynoms so zu wählen, dass $f(x_i)=f_i$ ist!\\
+\textbf{Satz:} Gegeben seien $n+1$ Wertepaare $(x_i,f_i)$, dann gibt es genau ein Polynom vom Grad höchstens $n$ so dass das Polynom $p(x_i)=f_i$ für alle $i$.
+Hierbei spricht man bei $n=1$ von einer linearen, bei $n=2$ von einer quadratischen Interpolation und so weiter.\\
+\subsubsection*{ Ineffiziente Methode:}
+Explizite Lösung eines linearen Gleichungssystems.\\
+\textbf{Beispiel:}\\
+\begin{figure}
+\center
+
+\begin{tabular}{|c||c|c|c|c|}
+
+$x_i$ & -1 & 0 & 1 & 2 \\ 
+\hline 
+$f_i$ & 5 & -2 & 9 & -4 \\ 
+
+\end{tabular}\\  
+\end{figure}
+\begin{align*}
+p(x)=\sum_{i=0}^3 a_i x^i \\
+f_j=\sum_{i=0}^3 a_i x_j^i,
+\end{align*}
+also 4 Gleichungen für 4 Unbekannte:
+\begin{align*}
+5=a_0+a_i(-1)+a_2 (-1)^2 + a_3 (-1)^3 \\
+-2=a_0 \\
+9=a_0+a_1 (1) + a_2 (1)^2 + a_3 (1)^3\\
+-4 =a_0 + a_1 (2) + a_2 (2)^2 +a_3 (2)^3.
+\end{align*}
+Als Lösung ergibt sich: \begin{align*}
+a_0=2, \quad a_1=9, \quad a_2=9 \\
+\Rightarrow p(x)=-2+9 x + 9 x^2 - 7 x^3.
+\end{align*}
+
+\subsubsection*{Lagrange Form}
+\begin{align*}
+p(x)=\sum_{i=0}^3 f_i \ l_i(x)
+\end{align*}
+mit $l_i(x)=\prod_{j=0, j \neq i}^n \frac{x-x_j}{x_i-x_j}$. \\
+In unserem Beispiel: $l_0(x)=(\frac{x-x_1}{x_0-x_1})(\frac{x-x_2}{x_0-x_2})(\frac{x-x_3}{x_0-x_3})$. Hier ist zu sehen, dass $l_0(x)$ an allen Stützstellen außer an $x_0$, und $l_0(x_0)=1$. (analoges gilt für alle anderen Polynome $l_1$, $l_2$, $l_3$)
+$\rightarrow p(x_i)=f_i$. \\
+Jedes $l_1$ ist ein Polynom dritten Grades.
+Die Berechnung von $p(x)$ durch Summation von $l_i(x)$ ist allerdings immer noch aufwendig, es gibt eine schnellere Methode.
+
+\subsubsection*{Newtonsche Interpolationsformel}
+
+Gegeben sind Wertepaare $(x_i,f_i)$ für $i=0,...n$.
+Zunächst werden "dividierte Differenzen" berechnet:\\
+(Pseudocode hier)\\
+\textbf{Bemerkung:} $x_i$ müssen nicht nach Größe sortiert sein außerdem können neue Wertepaare angefügt werden.
+
+In unserem Beispiel ergeben sich die dividierten Differenzen für $k=1$ zu:
+\begin{align*}
+f(x_0,x_1)=-7\\
+f(x_1,x_2)=11\\
+f(x_2,x_3)=-13
+\end{align*}
+und für für $k=2$:
+\begin{align*}
+f(x_0,x_1,x_2)=9 \\
+f(x_1,x_2,x_3)= -12
+\end{align*}
+Und daraus ergibt sich:
+\begin{align*}
+f(x_0,x_1,x_2,x_3)=-7.
+\end{align*}
+
+\subsubsection*{Interpolationsformel}
+\begin{equation*}
+p(x)= sum_{i=0}^n f(x_0,...,x_i) \prod_{j=0}^{i-1} (x-x_j)
+\end{equation*}
+\begin{equation*}
+=f(x_0)+f(x_0,x_1)(x-x_0)+f(x_0,x_1,x_2)(x-x_0)(x-x_i)
+\end{equation*}
+\begin{equation*}
++f(x_0,x_1,x_2,x_3)(x-x_0)(x-x_1)(x-x_2)
+\end{equation*}
+
+Für unser Beispiel ergibt sich also:
+\begin{equation*}
+p(x)=5+(-7)(x-(-1))+9(x-(-1))(x-0)+(-7)(x+1) x (x-1)
+\end{equation*}
+\begin{equation*}
+=-7x^3+9x^2+9x-2
+\end{equation*}
+
+Außerdem kann p(x) durch Ausklammern umgeformt werden:
+\begin{equation*}
+p(x)=f(x_0)+(x-x_0)(f(x_0,x_1)+(x-x_1)(f(x_0,x_1,x_2)+(x-x_2) f(x_0,x_1,x_2,x_3))))
+\end{equation*}
+Durch das einsparen von Punktoperationen kann so Rechenzeit gespart werden.
+\subsubsection*{Iterative Auswertung des Newton Polynoms, Horner Schema}
+\begin{lstlisting}[frame=single]
+	r_n=f(x_0,x_1,...,x_n)
+        For k = n-1,0
+       		r_k=r_(k+1) (x-x_k)+f(x_0,...,x_k)
+       	End for p(x)=r_0                      
+\end{lstlisting}
+Man benötigt also zur Auswertung des Newton Polynoms nur n Punkt-Operatoren.
+Daraus ergibt sich für unser Beispiel für:
+\begin{align*}
+r_3=f(x_0,x_1,x_2,x_3)=-7 \\
+r_2=r_3 (x-x_2)+ f(x_0,x_1, x_2)=-7(x-1)+9 \\
+r_1=r_2(x-x_1)+f(x_0,x_1)=(-7(x-1)+9)x-7 \\
+r_0=r_1(x-x_0)+f(x_0)=((-7(x-1)+9)x-7)(x+1)+5
+\end{align*}
+
+\subsubsection*{Problem bei Polynom-Interpolation}
+Gegeben sei die Funktion $f(x)=\frac{1}{1+x^2}$ mit: \\
+\begin{tabular}{c|ccccccc}
+ 
+$x_i$ & -3 & -2 & -1 & 0 & 1 & 2 & 3 \\ 
+\hline 
+$f_i$ & 0,1 & 0,2 & 0,5 & 1 &  &  &  \\ 
+
+\end{tabular}
+$\Rightarrow p(x)=1-0,64x^2+0,15x^4-0,06x^6$
+Das Polynom weißt an den Rändern des Stützstellenintervalls Überschwinger auf.
+Erhöhung von n verbessert die Situation nicht.
+Außerdem divergiert das Polynom außerhalb des Intervalls. \\
+$\rightarrow$ Interpolationspolynome sind nicht für Extrapolation geeignet.
+
+\subsection{Spline Interpolation}
+Ausgangsüberlegung: eine gute Näherung einer Funktion hat viele Stützstellen, allerdings besitzt ein Polynom hoher Ordnung auch viele Überschwingungen und divergiert stark.\\
+\textbf{Idee:}Teile Intervall in Teilintervalle auf, und benutze jeweils Polynome niedriger Ordnung.\\
+\begin{itemize}
+\item \textbf{Einfachste Stufe:} Stückweise Interpolation mit Geraden, hierbei entstehen allerdings Knicke.\\
+\item \textbf{Kubische Splines:} Hier wird zur ABhilfe eine stetige erste und zweite Ableitung gefordert.
+\end{itemize}
+
+\textbf{Definition:} eine Funktion $s(x):[a,b] \rightarrow \mathbb{R}$ heißt kubischer Spline zu den Stützstellen $a=x_0<x_1,...<x_n=b$ falls gilt:
+\begin{itemize}
+\item $s''(x)$ existiert und ist stetig
+\item $s(x)$ ist auf den Intervallen $[x_i,x_{i+1}]$ jeweils ein Polynom 3. Grades
+\item interpolieren der Spline Werten $f_0...f_n:s(x_i)=f_i \quad \text{für} \quad i=0,...,n$
+\item periodischer Spline: zusätzlich $s(a)=s(b)$ und $s'(a)=s'(b)$ und $s''(a)=s''(b)$
+\item natürlicher Spline: zusätzlich $s''(a)=s''(b)=0$
+\end{itemize}
+\subsubsection*{Bestimmung der Koeffizienten}
+Ein Polynom 3. Grades hat 4 Koeffizienten $\hat{=}$ Freiheitsgrade; für n Intervalle haben wir also $4n$ Koeffizienten!
+
+\begin{itemize}
+\item Pro Intervall 2 Interpolationsbedingungen (rechts und links) $\rightarrow$ $2n$
+\item An den Stützstellen $x_1,...,x_{n-1}$ sollen 1. und 2. Ableitungen gleich sein $\rightarrow$ $2(n-1)$ Bedingungen, zusammen gibt es also $4n-2$ Bedingungen.
+\end{itemize}
+Es sind also 2 zusätzliche Randbedingungen nötig.
+
+\subsubsection*{Praktische Berechnung von kubischen Splines}
+Wir definieren die "Momente" eines interpolierenden Splines als $M_i=s''(x_i)$. Mit diesen Momenten erhalten wir im Intervall $[x_{i-1},x_i], i=1,...,n$.
+\begin{align*}
+S_i(x)=M_{i-1} \frac{(x_i-x)^2}{6 h_i} + M_i \frac{(x-x_{i-1})^3}{6 h_i}+C_i(x- \frac{x_{i-1}+x_i}{2})+D_i\\
+\rightarrow s'_i(x)= -M_{i-1} \frac{(x_i-x)^2}{2 h_i} + M_i \frac{(x-x_{i-1})^2}{2 h_i + C_i} \\
+\rightarrow s''_i(x)= M_{i-1} \frac{x_i-x}{h_i} + M_i \frac{(x-x_{i-1})}%{h_i}\\
+h_i=x_i-x_{i-1}
+\end{align*}
+Die Ableitungen stimmen dabei an den Stützstellen überein:\\
+z.B.: $s''_i(x=x_i)=s''_{i+1}(x=x_i) \Leftrightarrow M_i=M_i$ \\
+$s'_i(x_i)=s'_{i+1}(x_i)$ und $s_i(x_i)=s_{i+1}(x_i)$ führen zu:
+\begin{align*}
+M_i M_{i-1} + 2 M_i + (1- \mu_i) M_{i+1} = 6 f(x_{i-1},x_i,x_{i+1})\\
+C_i = \frac{f_i-f_{i-1}}{h i}- \frac{h_i}{6}(M_i-M_{i-1}\\
+D_i= \frac{f_i+f_{i-1}}{2} -\frac{h_i^2}{12} (M_i+M_{i-1})\\
+\mu_i = \frac{x_i-x_{i-1}}{x_{i+1}-x_{i-1}}
+\end{align*}
+Zusätzlich muss gelten:
+\begin{itemize}
+\item natürliche splines: $M_0=M_n=0$
+\item preiodische splines: $M_0=M_n$, $\mu_n M_{n-1}+ 2 M_n + (1- \mu_n) M_n=6 f(x_{n-1},x_n,x_{n+1})$
+\end{itemize}
+wobei $x_{n+1} := x_n+x_1-x_0$ und $f_{n+1} := f_n$.
+Mit dem Beispiel \begin{figure}
+
+\center
+
+\begin{tabular}{|c||c|c|c|c|}
+
+$x_i$ & -1 & 0 & 1 & 2 \\ 
+\hline 
+$f_i$ & 5 & -2 & 9 & -4 \\ 
+
+\end{tabular}\\  
+\end{figure} ergibt sich daraus:
+\begin{align*}
+f(x_0,x_1,x_2)=9\\
+f(x_1,x_2,x_3)=-12\\
+\mu_i = \frac{1}{2}\\
+\text{natürlicher spline:} M_0=M_3=0
+\rightarrow \frac{1}{2} M_0+2M_i+\frac{1}{2} M_2 =54 \\
+\frac{1}{2} M_i+ 2 M_2 + \frac{1}{2} M_3 =-72 \\
+\end{align*}
+Dieses Gleichungssystem ist dann zu lösen nachdem sich $C_i$ und $D_i$ durch einsetzen ergeben.
+Für $n>3$: lineares Gleichungssystem für $M_n$!
+Daraus resultieren 3 Splines für die 3 Intervalle:
+\begin{align*}
+[-1,0]:s(x)=38,4 \frac{(x+1)^3}{6} + C_i(x+0,5)+D_1\\
+[0,1]:s(x)=38,4 \frac{(x-1)^3}{6} - 45,6 \frac{x^3}{6}+C_2 (x-0,5)+D_2\\
+[1,2]: s(x)=-45,6 \frac{(2-x)^3}{6}+C_3 (x-1,5)+ D_3
+\end{align*}
+Zurück zum Beispiel $f(x)=\frac{1}{1+x^2}$. (Problem der Überschwinger).
+Der kubische Spline erzeugt hierbei keine Überschwinger.
+
+\subsection{Lineare Ausgleichsrechnung}
+gegeben: $n$ Wertepaare $(x_i,y_i), i=1,...,n$ mit $x_i \neq x_j$ für $i \neq j$ \\
+gesucht: stetige Funktion so dass möglichste genau $f(x_i) \approx y_i$ für alle $i$.
+Wenn man die zulässigen Funktionen nicht einschränkt dann gelangt man zum Interpolationsproblem mit $f(x_i)=y_i$.
+Wir schränken also den absoluten Funktionsraum ein.\\
+\textbf{Def.:} gegebene Menge $F$ von stetigen Funktionen sowie n Wertepaare $(x_i, y_i)$; Funktionen $f \in F$ heißt Ausgleichsfunktion falls das Fehlerfunktional:
+\begin{align*}
+E(f)= \sum_{i=1}^n (y_i-f(x_i))^2
+\end{align*}
+minimiert wird.\\
+Bemerkung: \begin{itemize}
+\item häufig mehr Funktionswerte als Anpassparameter
+\item Funktion f ist optimal bzgl.der 2er-Norm
+\item es ist möglich die Wertepaare zu wichten: $E(f)= \omega_i \sum_{i=1}^n (y_i-f(x_i))^2$ mit $\omega_i \in [0,1]$
+\item für $F=$Menge aller Geraden $\rightarrow$ $f=$ Ausgleichs- oder Regressionsgerade.
+\end{itemize}
+\textbf{Beispiel:}
+Wertepaare: \begin{figure}
+\center
+
+\begin{tabular}{|c||c|c|c|c|}
+
+$x_i$ & 1 & 2 & 3 & 4 \\ 
+\hline 
+$y_i$ & 6 & 6,8 & 10 & 10,5 \\ 
+
+\end{tabular}\\  
+\end{figure}
+\\
+Wie lautet die Ausgleichsgerade? \\
+Funktion $y=a x +b$ oder allgemein: $F:=\{a_1 f_1+a2 f_2\|a_1,a_2 \in \mathbb{R}$ mit Ansatzfunktionen $f_1(x)=x$ und $f_2(x)=1$.\\
+Aufgrund der Linearität in den Koeffizienten $a_1$ und $a_2$ wird dies lineares Problem genannt.
+Daraus ergibt sich das Fehlerintervall: $E(a,b)=\sum_i^4(y_i-(a x_i+b))^2$:
+\begin{align*}
+\frac{\partial E}{\partial a} = -2 \sum_{i=1}^n (y_i(a x_i+b))x_i=0 \\
+\rightarrow a \sum_i x_i^2+ b \sum_i x_i=sum_i x_i y_i \\
+\frac{\partial E}{\partial b} = -2 \sum_{i=1}^n (y_i-(a x_i + b_i))=0 \\
+\rightarrow a \sum_i x_i + b \sum_i 1=\sum_i y_i
+\end{align*}
+Also ein lineares Gleichungssystem für $a$ und $b$:
+\begin{align*}
+\begin{pmatrix}
+\sum x_i^2 & \sum_i x_i \\
+\sum x_i & n
+\end{pmatrix}
+\begin{pmatrix}
+a \\
+b
+\end{pmatrix} = \begin{pmatrix}
+\sum_i x_i y_i \\
+\sum_i y_i
+\end{pmatrix} \\
+\rightarrow
+\begin{pmatrix}
+30 & 10 \\
+10 & 4
+\end{pmatrix}
+\begin{pmatrix}
+a \\
+b
+\end{pmatrix} = \begin{pmatrix}
+91,6 \\
+33,3
+\end{pmatrix}
+\end{align*}
+Die allgemeine Definition des Ausgleichproblems ergibt sich wie folgt:\\
+gegeben: Ansatzfunktion: $f=\sum_{i=1}^m a_i f_i$ mit $a_i \in \mathbb{R}$\\
+und Wertepaare $(x_i, y_i)$ mit $i=1...n$ \\
+Fehlerintervall: $E(a_n)=\sum_{i=1}^n (y_i-f(x_i))^2=\sum_{i=1}^n(y_i-\sum_{j=1}^m a_j f_j(x_i))^2=||\boldsymbol{y}-\boldsymbol{A \boldsymbol{a}}||_2$, mit:
+\begin{align*}
+A=\begin{pmatrix}
+f_1(x_1) & f_2(x_1) & ... & f_m(x_1)\\
+. & & & .\\
+. & & & .\\
+. & & & .\\
+f_1(x_n) & ... & &f_m(x_n)
+\end{pmatrix}
+a = \begin{pmatrix}
+a_1 \\
+a_2 \\
+.\\
+.\\
+a_m
+\end{pmatrix},
+y= \begin{pmatrix}
+y_1 \\
+.\\
+.\\
+.\\
+a_m
+\end{pmatrix}
+\end{align*}
+
+$ y = \boldsymbol{A} \boldsymbol{a}$ nennt man das Fehlergleichungssystem und typischerweise gibt es keine Lösung. \\
+Die Gleichungen heißen $0=\frac{\partial E(\{a_m\})}{\partial a_i}$ mit $i=1...m$ Normalengleichungen.
+Normalgleichungssystem $A^TAa=A^Ty$
 
 
 \end{document}
