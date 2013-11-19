@@ -1148,7 +1148,7 @@ Aufgrund der Linearität in den Koeffizienten $a_1$ und $a_2$ wird dies lineares
 Daraus ergibt sich das Fehlerintervall: $E(a,b)=\sum_i^4(y_i-(a x_i+b))^2$:
 \begin{align*}
 \frac{\partial E}{\partial a} = -2 \sum_{i=1}^n (y_i(a x_i+b))x_i=0 \\
-\rightarrow a \sum_i x_i^2+ b \sum_i x_i=sum_i x_i y_i \\
+\rightarrow a \sum_i x_i^2+ b \sum_i x_i=\sum_i x_i y_i \\
 \frac{\partial E}{\partial b} = -2 \sum_{i=1}^n (y_i-(a x_i + b_i))=0 \\
 \rightarrow a \sum_i x_i + b \sum_i 1=\sum_i y_i
 \end{align*}
@@ -1206,9 +1206,187 @@ a_m
 \end{pmatrix}
 \end{align*}
 
-$ y = \boldsymbol{A} \boldsymbol{a}$ nennt man das Fehlergleichungssystem und typischerweise gibt es keine Lösung. \\
-Die Gleichungen heißen $0=\frac{\partial E(\{a_m\})}{\partial a_i}$ mit $i=1...m$ Normalengleichungen.
-Normalgleichungssystem $A^TAa=A^Ty$
+$ \boldsymbol{y} = \boldsymbol{A} \boldsymbol{a}$ nennt man das Fehlergleichungssystem und typischerweise gibt es keine Lösung, da sonst der Fehler 0 wäre $\rightarrow$ Interpolation. \\
+Die Gleichungen $0=\frac{\partial E(\{a_m\})}{\partial a_i}$ mit $i=1...m$ heißen Normalgleichungen.
+Das Normalgleichungssystem ergibt sich als: $A^TAa=A^Ty$\\
+\textbf{Herleitung:}\\
+\begin{align*}
+E(\{a_m\})=(\boldsymbol{y}-\boldsymbol{A} \boldsymbol{a}))^2=(y_i-A_{ij} a_j)(y_i-A_{ik} a_k)\\
+=y_i^2-A_{ij} a_j y_i-y_i A_{ik} a_k +A_{ij} a_j A_{ik} a_k \\
+=y_i^2 -2 A_{ij} a_j y_i +A_{ij} a_j A_{ik} a_k \\
+\frac{\partial E}{\partial a_l} = -2 A_{il} y_i + A_{il} A_{ik} a_k + A_{ij} a_j A_{il}\\
+=-2 A_{il} y_i +2 A_{il} A_{ik} a_k )=0 \rightarrow A_{il} A_{ik} a_k= A_{il} y_i \\
+\leftrightarrow A_{li}^T A_{ik} a_k =A_{li}^T y_i \leftrightarrow \underbrace{\boldsymbol{A}^T \boldsymbol{A}}_\text{mxm} \underbrace{\boldsymbol{a}}_\text{m Komponenten} = \underbrace{\boldsymbol{A}^T}_\text{m Komponenten}
+\underbrace{\boldsymbol{y}}_\text{n Komponenten}
+\end{align*}
+\textbf{Bemerkungen:} Das Fehlergleichungssystem besteht aus n-Gleichungen(=Wertepaare), allerdings gibt es nur m Unbekannte(Anpassungsparamter).
+$n>m \rightarrow$ das Fehlergleichungssystem ist überbestimmt, es gibt also im allgemeinen keine Lösung.\\
+Man bezeichnet $r=A a -y$, als Residuumsvektor welcher im Allgemeinen nicht verschwindet.\\
+Im Fall $r=0$ ist $a$ Lösung des Fehlergleichungssystems und es liegt eine perfekt Modellanpassung vor (Interpolation).
+Die ist typischerweise der Fall für $m=n$ (Außer wenn Anpassungsfunktionen oder Wertepaare redundant sind...).
+
+Also bedeutet die Lösung des Ausgleichproblems, dass das Fehlerfunktional bzgl. $\boldsymbol{a}$ minimal ist.
+Die entspricht dann der Lösung des Normalengleichungssystems.
+Dies entspricht einem Gleichungssystem aus $A^T A$ und $A^T y \rightarrow$ Cholesky Dekomposition möglich, der Lösungsvektor ist dann $\boldsymbol{a}$. 
+Die Symmetrie für die CHolesky Dekomposition ist gegeben weil $B_{ik}=A_{ij}^TA_{jk}=A_{ki}^T A_{ji}=A_{jk}A_{ij}^T=A_{ij}^T A_{jk}$
+In unserem Beispiel ergab sich: \begin{figure}
+\center
+
+\begin{tabular}{|c||c|c|c|c|}
+
+$x_i$ & 1 & 2 & 3 & 4 \\ 
+\hline 
+$y_i$ & 6 & 6,8 & 10 & 10,5 \\ 
+
+\end{tabular}
+\end{figure}\\
+Als Anfangsfunktionen nutzen wir: $f_1(x)=x$ und $f_2(x)=1$.
+\begin{align*}
+A=\begin{pmatrix}
+f_1(x_1) & f_2(x_1) \\
+f_1(x_2) & f_2(x_2) \\
+f_1(x_3) & f_2(x_3) \\
+f_1(x_4) & f_2(x_4) 
+\end{pmatrix}= \begin{pmatrix}
+1 & 1\\
+2 & 1\\
+3 & 1\\
+4 & 1
+\end{pmatrix}, \quad A^T A = \begin{pmatrix}
+1 & 2 & 3 & 4\\
+1 & 1 & 1 & 1
+\end{pmatrix} \begin{pmatrix}
+1 & 1\\
+2 & 1\\
+3 & 1\\
+4 & 1
+\end{pmatrix}
+=\begin{pmatrix}
+30 & 10 \\
+10 & 4
+\end{pmatrix} \\
+A^T y = \begin{pmatrix}
+1 & 2 & 3 & 4\\
+1 & 1 & 1 & 1
+\end{pmatrix} \begin{pmatrix}
+6 \\
+6,8 \\
+10\\
+10,5
+\end{pmatrix}= \begin{pmatrix}
+91,6 \\
+33,3
+\end{pmatrix}
+\end{align*}  
+Also:
+\begin{align*}
+A^T A A = A^T y \leftrightarrow \begin{pmatrix}
+30 & 10 \\
+10 & 4
+\end{pmatrix} \begin{pmatrix}
+a_1 \\ 
+a_2
+\end{pmatrix}= \begin{pmatrix}
+91,6 \\
+33,3
+\end{pmatrix}
+\end{align*}
+Also das gleiche Gleichungssystem wie vorher.
+Auch bei einem nicht-linearen Funktionsansatz $f_1(x)=x^2$ und $f_2(x)=1$ ergibt sich eine lineare Ausgleichsrechnung:
+\begin{align*}
+A=\begin{pmatrix}
+1 & 1\\
+4 & 1\\
+9 & 1\\
+16 & 1
+\end{pmatrix}, \quad A^T A = \begin{pmatrix}
+1 & 4 & 9 & 16\\
+1 & 1 & 1 & 1
+\end{pmatrix} \begin{pmatrix}
+1 & 1\\
+4 & 1\\
+9 & 1\\
+16 & 1
+\end{pmatrix}
+=\begin{pmatrix}
+354 & 30 \\
+30 & 4
+\end{pmatrix} \\
+A^T y = \begin{pmatrix}
+1 & 4 & 9 & 16\\
+1 & 1 & 1 & 1
+\end{pmatrix} \begin{pmatrix}
+6 \\
+6,8 \\
+10\\
+10,5
+\end{pmatrix}= \begin{pmatrix}
+291,2,6 \\
+33,3
+\end{pmatrix}
+\end{align*}  
+Wie versprochen immer noch linear:
+\begin{align*}
+A^T A a = A^T y \rightarrow a_1=1,296 \quad a_2=-5,59 \\
+\text{mit:} \ f(x)=a_1 x^2 + a_2
+\end{align*}
+
+Für unser Beispiel ist der lineare Fit besser, also $|r|$ ist kleiner.
+
+\subsection{Nicht-lineare Ausgleichsprobleme, Gauß-Newton Verfahren}
+\textbf{Beispiel:} Wir betrachten wieder die Wertepaare $x_i$ und $y_i$ und die Funktion $f(x)=a e^{bx}$ mit den Anpassungsparametern $a$ und $b$. $f(x)$ hängt also nichtlinear von $b$ ab! \\
+\textbf{Trick}: betrachte $ln(f(x))=ln(a)+b x$ und die logarithmischen Funktionswerte in der Form: \begin{figure}
+\center
+
+\begin{tabular}{|c||c|c|c|c|}
+
+$x_i$ & 1 & 2 & 3 & 4 \\ 
+\hline 
+$ln(y_i)$ & 1,72 & 1,52 & 2,30 & 2,35\\ 
+
+\end{tabular}
+\end{figure}\\
+Damit ergibt sich: $f(x)= a x^b \rightarrow ln(f) c+ b x$
+
+Änhlich kann verwendet werden: $f(x) = a x^b \rightarrow ln(f) = ln(a) + b ln(x) = c + b \tilde{x}$
+
+\textbf{Echtes Beispiel:} $f(x)=a ln(x+b)$
+
+\textbf{Definition eines allgemeinen Ausgleichssystems:} Gegeben ist eine Ansatzfunktion $f_a(a_1,... a_m, x)$ und Wertepaare $(x_i,y_i)$ mit $i=1...n$ mit dem Fehlerfunktional $E(a_I,...a_m) = \sum_{i_1}^n (y_i -f_a(a_{ij},...a_{mj},x_i))^2$\\
+Dasraus ergibt sich das Ausgleichsproblem: Minimiere E im erlaubten Parameterraum.
+
+\textbf{Bermerkung:} im allgemeinen Fall ist ein lineares Problem enthalten. Im Prinzip kann man das nicht-lineare Gleichungssystem $\frac{\partial E}{\partial a_i}=0$ mit dem Newton-Verfahren lösen; Nachteil: instabil und zweite partielle Ableitungen werden benötigt.\\
+$\rightarrow$ Gauß-Newton-Verfahren \\
+Definiere Vektor $\boldsymbol{g}(a_i,... a_n) = \begin{pmatrix}
+y_1-f_a(a_1,... a_m, x_1)\\
+.\\
+.\\
+.\\
+y_n-f_a(a_1,... a_m, x_n)
+\end{pmatrix}$ mit $f: \mathbb{R}^m \rightarrow \mathbb{R}^n$.
+Das Fehlerfunktion ist dann: $E(\boldsymbol{a})=g^2, \ E:\mathbb{R}^m \rightarrow \mathbb{R}$\\
+\textbf{Problem:} Finde $\boldsymbol{a}$ so dass $E(\boldsymbol{a})$ minimal wird. Dies beschreibt ein Quadramittelproblem. \\
+\textbf{Idee:} $g(\boldsymbol{a})$ in $E$ wird durch eine Linearisierung ersetzt:
+hierzu wird der lineare Ausdruck minimiert.
+Dieser Prozess wird dann iteriert wie beim Newton-Verfahren.
+
+Starte mit Schätzwert: $\boldsymbol{a}^{(0)}$, das lineare Ausgleichproblem ist dann definiert durch:
+\begin{align*}
+E(\boldsymbol{a^0}) = (g(\boldsymbol{a})+ D(g(a^0))(\boldsymbol{a}-\boldsymbol{a^0}))^2
+\end{align*}
+mit der Jacobi-Matrix $D$.
+Berechne dann $\delta^{(n)}=a{(n+1)}-a^{(n)}$ als Lösung des linearen Ausgleichsproblems, also:
+\begin{align*}
+\text{min}_{\delta^{(n)}}(g(a^{(n)})+D(g(a^{(n)})) \delta^{(n)})^2
+\end{align*}
+Setze dann $a^{(n+1)}= a^{(n)}+ \delta ^{(n)}$ und löse:
+\begin{align*}
+D^T(g(a^{(n)})) D(g(a^{(n)})) \delta^{(n)} = - D^T(g(a^{(n)})) g(a^{(n)})
+\end{align*}
+und iteriere.
+
+
+
 
 
 \end{document}
