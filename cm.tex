@@ -1229,7 +1229,7 @@ Also bedeutet die Lösung des Ausgleichproblems, dass das Fehlerfunktional bzgl.
 Die entspricht dann der Lösung des Normalengleichungssystems.
 Dies entspricht einem Gleichungssystem aus $A^T A$ und $A^T y \rightarrow$ Cholesky Dekomposition möglich, der Lösungsvektor ist dann $\boldsymbol{a}$. 
 Die Symmetrie für die CHolesky Dekomposition ist gegeben weil $B_{ik}=A_{ij}^TA_{jk}=A_{ki}^T A_{ji}=A_{jk}A_{ij}^T=A_{ij}^T A_{jk}$
-In unserem Beispiel ergab sich: \begin{figure}
+In unserem Beispiel ergab sich: \begin{figure}[h]
 \center
 
 \begin{tabular}{|c||c|c|c|c|}
@@ -1335,7 +1335,7 @@ Für unser Beispiel ist der lineare Fit besser, also $|r|$ ist kleiner.
 
 \subsection{Nicht-lineare Ausgleichsprobleme, Gauß-Newton Verfahren}
 \textbf{Beispiel:} Wir betrachten wieder die Wertepaare $x_i$ und $y_i$ und die Funktion $f(x)=a e^{bx}$ mit den Anpassungsparametern $a$ und $b$. $f(x)$ hängt also nichtlinear von $b$ ab! \\
-\textbf{Trick}: betrachte $ln(f(x))=ln(a)+b x$ und die logarithmischen Funktionswerte in der Form: \begin{figure}
+\textbf{Trick}: betrachte $ln(f(x))=ln(a)+b x$ und die logarithmischen Funktionswerte in der Form: \begin{figure}[h]
 \center
 
 \begin{tabular}{|c||c|c|c|c|}
@@ -1383,9 +1383,141 @@ Setze dann $a^{(n+1)}= a^{(n)}+ \delta ^{(n)}$ und löse:
 \begin{align*}
 D^T(g(a^{(n)})) D(g(a^{(n)})) \delta^{(n)} = - D^T(g(a^{(n)})) g(a^{(n)})
 \end{align*}
-und iteriere.
+und iteriere. 
+
+In der Praxis benutzt man ein gedämpftes Gauß-Newton-Verfahren:
+\begin{itemize}
+\item Berechne wieder $\delta^{(n)}$
+\item Bestimmung des Dämpfungsfaktor: \\
+Wähle die größte Zahl $t \in \{1, \frac{1}{2}, \frac{1}{4},...\}$ für die mit $\phi(t)=(g(a^{(n)}+t \delta^{(n)}))^2$ gilt: $\phi(t) < \phi(0)$.
+\item Setze $a^{(n+1)} = a^{(n)} t \delta^{(n)}$ und iteriere.
+\end{itemize}
+\textbf{Bemerkung:} Der Dämpfungsfaktor $t$ erhöht den EInzugsbereich des Verfahrens, d.h. das gedämpfte Verfahren konvergiert für einen Bereich von Startvektoren $\boldsymbol{a^{(0)}}$ (vergleiche mit $t=1$, ungedämpft).
+
+\begin{itemize}
+\item Fehler wird geringer in jedem Schritt: $(\boldsymbol{g}(\boldsymbol{a}^{(n+1)}))^2=\phi(t)<\phi(0)=(\boldsymbol{g}(\boldsymbol{a}^{(n)}))^2)^2$\\
+(aber: Konvergenz zum echten Minimum nicht garantiert.)
+\item Abbruchbedingung: $\sqrt{(t \boldsymbol{\delta}^{(n)})^2} < \text{TOL}$\\
+(aber: bedeutet nicht dass man sich im Abstand TOL vom gesuchten Minimum befinde!)
+\end{itemize} 
+Beispiel: \begin{figure}[h]
+\center
+\begin{tabular}{|c||c|c|c|c|c|}
+
+$x_i$ & 0 & 1 & 2 & 3 & 4 \\ 
+\hline 
+$ln(y_i)$ & 3 & 1 & 0,5 & 0,2 &0,05\\ 
+
+\end{tabular}
+\end{figure}
+mit der Ansatzfunktion: $f(x)= a_1 e^{a_2 x}$.\\
+Die Verteilungsfunktion lautet also: $g(a_1,a_2)_i=y_i-a_1 e^{(a_2 x_i)}$ und die Jacobi Matrix: $D(g)= \frac{\partial g_i(a_m)}{\partial a_j}=(-e^{(a_2 x_i)}, -a_i x_i e^{(a_2 x_i)})$. Wir erwarten: $a_1>0, a_2<0$.\\
+Ungedämpft $t=1$:\\
+\begin{figure}[h]
+\center
+\begin{tabular}{|c||c|c|c|c|c|}
+
+$i$ & 0 & 1 & 2 & 3 & 4 \\ 
+\hline 
+$a^{(i)})$ & 1 & 2,99 & 1,26 & 2,91 &2,98\\  
+ & -1,5 & 0,32 & 0,279 & -0,86 &-1,00\\ 
+
+\end{tabular}
+\end{figure}\\
+Für den Startwert $a^{(0)} = \begin{pmatrix}
+2 \\
+2
+\end{pmatrix}$ keine Konvergenz. \\
+Gedämpftes Verfahren: \\
+\begin{figure}[h]
+\center
+\begin{tabular}{|c||c|c|c|c|}
+
+$i$ & 0 & 1 & 2 & 3\\ 
+\hline 
+$a^{(i)})$ & 1 & 1,99 & 2,92 & 2,98\\  
+ & -1,5 & -0,56 & -0,951 & -0,999\\ 
+
+\end{tabular}
+\end{figure}
+\begin{figure}[h]
+\center
+\begin{tabular}{|c||c|c|c|c|c|c|}
+
+$i$ & 0 & 1 & 2 & 3 & ... & 10 \\ 
+\hline 
+$a^{(i)}$ & 2 & 0,003 & 0,004 & 0,207 & ... & 10\\  
+ & 2 & 2,00 & 1,75 & -0,79 & ... & -1,00\\ 
+
+\end{tabular}
+\end{figure}\\
+Das gedämpfte Verfahren ist schneller und konvergenter.
 
 
+\section{Numerische Differentiation/Integration}
+\subsection{Numerische Differentiation}
+In vielen Anwendungen $\rightarrow f'(x_0), f''(x_0)$ eienr Funktion $f(x)$ werden benötigt, aber diese Funktionen stehen nicht zur Verfügung $\rightarrow$ Näherungen!\\
+\textbf{Definition:} Ableitung als Grenzwert eines Differenzenquotienten: $f'(x_0)= lim_{x \rightarrow x_0} \frac{f(x)-f(x_0) }{x-x_0} \approx \frac{f(x)-f(x_0) }{h}:= D_1 f(x_0,h)$\\
+$D_1 f(x_0,h)$ ist dabei die Differenzenformel oder finite Differenz erster Ordnung.\\Herleitung genauer Differenzenformel und Fehlerschätzung mit Taylorentwicklung:
+\begin{align}
+f(x_0+h)=f(x_0)+ h f'(x_0)+ \frac{1}{2} h^2 f''(x_0)+...\\
+f(x_0-h)=f(x_0)+ -h f'(x_0)+ \frac{1}{2} h^2 f''(x_0)+...
+\end{align}
+Fehlerabschätzung:\\
+Aus der ersten Gleichung ist ersichtlich: $h f'(x_0)= f(x_0+h)-f(x_0)-\frac{1}{2} h^2 f''(x_0)+...$\\
+\begin{align*}
+\rightarrow f'(x_0)= \frac{f(x_0+h)-f(x_0)}{h}- \frac{1}{2} h f''(x_0)+... \\
+f'(x_0)= D_1(f(x_0,h))- \frac{1}{2} h f''(x_0)
+\end{align*}
+\textbf{Definition Diskretisierungsfehler:} Bei Differenzenformeln für $f'(x_0)$ bezeichnet man den Fehler $|D_f(x_0,h)-f'(x_0)|$ als Diskretisierungs- oder Abschneidefehler. Die Formel $D_f$ hat die Fehlerordnung $k$ falls es ein $C>0$ gibt so dass für kleines $h$ gilt:
+\begin{align*}
+|D_f(x_0,h)-f'(x_0)| \leq C h^k
+\end{align*}
+Als Kurzschreibweise nutzt man für den Fehler: $\sigma(h^k)$.
+In unserem Beispiel erhalten wir also: $D_1 \rightarrow |D(f(x_0,h))-f'(x_0)|\approx \frac{1}{2} h f''(x_0) \leq C h^k$ mit $k=1$.
+In unserem Beispiel ist die Fehlerordnung also $k=1$! Formeln mit höherer Ordnung sind besser, da bei Halbierung von $h$ der Fehler um den Faktor $(\frac{1}{2})^k$ kleiner wird(Vorfaktoren $C$ sind also typischerweise nicht so wichtig).\\
+
+\textbf{Herleitung einer besseren Formel für Differentiale:}\\
+Berechne:
+\begin{align*}
+f(x_0+h)-f(x_0-h)= 2 h f'(x_0) +\frac{1}{3} h^3 f''' (x_0) + ... \\
+\rightarrow D_2 f(x_0, h) := \frac{f(x_0+h)-f(x_0-h)}{2 h} \\
+\text{und} D_2 f(x_0,h)-f'(x_0) = \frac{1}{6} h^2 f'''(x_0)
+\end{align*}
+$D_2 f$ ist also eine Differenzenformel der Fehlerordnung $k=2$ für $f'(x)$ (außerdem eine symmetrische zentrale Differenzenformel).
+
+\textbf{höhere Ableitungen:}
+Addition der Taylor-Ausdrücke:
+\begin{align*}
+f(x_0+h)+f(x_0-h)= 2 f(x_0)+ h^2 f''(x_0) + \frac{1}{12} h^4 f^{\text{IV}}(x_0)+... \\
+\rightarrow f''(x_0)= \frac{f(x_0+h)-2 f(x_0)+f(x_0-h)}{h^2} - \frac{1}{12} h^2 f^{\text{IV}}(x_0)
+\end{align*}
+
+\textbf{Balance von Diskretisierungs- und Rundungsfehlern:}
+\textbf{Beispiel:} Formel $D,f=\frac{f(x_0+h)-f(x_0)}{h}$ für $f(x)= sin(x)$ und $x_0=1$; $f'(x)=cos(x), f'(1)=0,54...$: \\
+
+\begin{figure}[h]
+\center
+\begin{tabular}{c|c}
+
+$h$ & $|D_1 f(x_0=1,h)-cos(x_0=1)|$\\ 
+\hline 
+$10^{-1}$ & $0,043$ \\  
+$10^{-2}$ & $0,004$ \\
+$10^{-3}$ & $0,0004$ \\
+$10^{-4}$ & $0,00004$ \\
+$10^{-5}$ & $0,000002$ \\
+$10^{-6}$ & $0,000002$ \\ 
+$10^{-7}$ & $0,0003$ \\
+$10^{-9}$ & $0,04$ \\
+$10^{-10}$ & $0,54$ \\
+\end{tabular}
+\end{figure}
+\newpage
+Daraus folgt:
+$h=10^{-12} \rightarrow 0,54$\\
+Für abnehmende $h$ wird der Fehler zunächst kleiner, steigt dann aber wieder an und bleibt für $h<10^{-10}= \epsilon$ konstant, da $x_0=1=1+h$ und damit $D_1(f(x_0=1, h<10^{-10}))=0$
+Dilemma: Für große $h$ ergibt sich ein Diskretisierungsfehler und für kleine ein Rundungsfehler. 
 
 
 
