@@ -981,7 +981,7 @@ f(x_0,x_1,x_2,x_3)=-7.
 
 \subsubsection*{Interpolationsformel}
 \begin{equation*}
-p(x)= sum_{i=0}^n f(x_0,...,x_i) \prod_{j=0}^{i-1} (x-x_j)
+p(x)= \sum_{i=0}^n f(x_0,...,x_i) \prod_{j=0}^{i-1} (x-x_j)
 \end{equation*}
 \begin{equation*}
 =f(x_0)+f(x_0,x_1)(x-x_0)+f(x_0,x_1,x_2)(x-x_0)(x-x_i)
@@ -1062,17 +1062,17 @@ Es sind also 2 zusätzliche Randbedingungen nötig.
 \subsubsection*{Praktische Berechnung von kubischen Splines}
 Wir definieren die "Momente" eines interpolierenden Splines als $M_i=s''(x_i)$. Mit diesen Momenten erhalten wir im Intervall $[x_{i-1},x_i], i=1,...,n$.
 \begin{align*}
-S_i(x)=M_{i-1} \frac{(x_i-x)^2}{6 h_i} + M_i \frac{(x-x_{i-1})^3}{6 h_i}+C_i(x- \frac{x_{i-1}+x_i}{2})+D_i\\
+S_i(x)=M_{i-1} \frac{(x_i-x)^3}{6 h_i} + M_i \frac{(x-x_{i-1})^3}{6 h_i}+C_i(x- \frac{x_{i-1}+x_i}{2})+D_i\\
 \rightarrow s'_i(x)= -M_{i-1} \frac{(x_i-x)^2}{2 h_i} + M_i \frac{(x-x_{i-1})^2}{2 h_i + C_i} \\
-\rightarrow s''_i(x)= M_{i-1} \frac{x_i-x}{h_i} + M_i \frac{(x-x_{i-1})}%{h_i}\\
+\rightarrow s''_i(x)= M_{i-1} \frac{x_i-x}{h_i} + M_i \frac{(x-x_{i-1})}{h_i}\\
 h_i=x_i-x_{i-1}
 \end{align*}
 Die Ableitungen stimmen dabei an den Stützstellen überein:\\
 z.B.: $s''_i(x=x_i)=s''_{i+1}(x=x_i) \Leftrightarrow M_i=M_i$ \\
 $s'_i(x_i)=s'_{i+1}(x_i)$ und $s_i(x_i)=s_{i+1}(x_i)$ führen zu:
 \begin{align*}
-M_i M_{i-1} + 2 M_i + (1- \mu_i) M_{i+1} = 6 f(x_{i-1},x_i,x_{i+1})\\
-C_i = \frac{f_i-f_{i-1}}{h i}- \frac{h_i}{6}(M_i-M_{i-1}\\
+\mu_i M_{i-1} + 2 M_i + (1- \mu_i) M_{i+1} = 6 f(x_{i-1},x_i,x_{i+1})\\
+C_i = \frac{f_i-f_{i-1}}{h i}- \frac{h_i}{6}(M_i-M_{i-1})\\
 D_i= \frac{f_i+f_{i-1}}{2} -\frac{h_i^2}{12} (M_i+M_{i-1})\\
 \mu_i = \frac{x_i-x_{i-1}}{x_{i+1}-x_{i-1}}
 \end{align*}
