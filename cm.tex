@@ -1099,8 +1099,8 @@ f(x_0,x_1,x_2)=9\\
 f(x_1,x_2,x_3)=-12\\
 \mu_i = \frac{1}{2}\\
 \text{natürlicher spline:} M_0=M_3=0
-\rightarrow \frac{1}{2} M_0+2M_i+\frac{1}{2} M_2 =54 \\
-\frac{1}{2} M_i+ 2 M_2 + \frac{1}{2} M_3 =-72 \\
+\rightarrow \frac{1}{2} M_0+2M_1+\frac{1}{2} M_2 =54 \\
+\frac{1}{2} M_1+ 2 M_2 + \frac{1}{2} M_3 =-72 \\
 \end{align*}
 Dieses Gleichungssystem ist dann zu lösen nachdem sich $C_i$ und $D_i$ durch einsetzen ergeben.
 Für $n>3$: lineares Gleichungssystem für $M_n$!
@@ -1126,7 +1126,7 @@ minimiert wird.\\
 Bemerkung: \begin{itemize}
 \item häufig mehr Funktionswerte als Anpassparameter
 \item Funktion f ist optimal bzgl.der 2er-Norm
-\item es ist möglich die Wertepaare zu wichten: $E(f)= \omega_i \sum_{i=1}^n (y_i-f(x_i))^2$ mit $\omega_i \in [0,1]$
+\item es ist möglich die Wertepaare zu gewichten: $E(f)=  \sum_{i=1}^n (\omega_i(y_i-f(x_i))^2$ mit $\omega_i \in [0,1]$
 \item für $F=$Menge aller Geraden $\rightarrow$ $f=$ Ausgleichs- oder Regressionsgerade.
 \end{itemize}
 \textbf{Beispiel:}
