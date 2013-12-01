@@ -1364,7 +1364,7 @@ y_1-f_a(a_1,... a_m, x_1)\\
 .\\
 y_n-f_a(a_1,... a_m, x_n)
 \end{pmatrix}$ mit $f: \mathbb{R}^m \rightarrow \mathbb{R}^n$.
-Das Fehlerfunktion ist dann: $E(\boldsymbol{a})=g^2, \ E:\mathbb{R}^m \rightarrow \mathbb{R}$\\
+Das Fehlerfunktional ist dann: $E(\boldsymbol{a})=g^2, \ E:\mathbb{R}^m \rightarrow \mathbb{R}$\\
 \textbf{Problem:} Finde $\boldsymbol{a}$ so dass $E(\boldsymbol{a})$ minimal wird. Dies beschreibt ein Quadramittelproblem. \\
 \textbf{Idee:} $g(\boldsymbol{a})$ in $E$ wird durch eine Linearisierung ersetzt:
 hierzu wird der lineare Ausdruck minimiert.
@@ -1372,10 +1372,10 @@ Dieser Prozess wird dann iteriert wie beim Newton-Verfahren.
 
 Starte mit Schätzwert: $\boldsymbol{a}^{(0)}$, das lineare Ausgleichproblem ist dann definiert durch:
 \begin{align*}
-E(\boldsymbol{a^0}) = (g(\boldsymbol{a})+ D(g(a^0))(\boldsymbol{a}-\boldsymbol{a^0}))^2
+E(\boldsymbol{a}) = (g(\boldsymbol{a})+ D(g(a^0))(\boldsymbol{a}-\boldsymbol{a^0}))^2
 \end{align*}
 mit der Jacobi-Matrix $D$.
-Berechne dann $\delta^{(n)}=a{(n+1)}-a^{(n)}$ als Lösung des linearen Ausgleichsproblems, also:
+Berechne dann $\delta^{(n)}=a^{(n+1)}-a^{(n)}$ als Lösung des linearen Ausgleichsproblems, also:
 \begin{align*}
 \text{min}_{\delta^{(n)}}(g(a^{(n)})+D(g(a^{(n)})) \delta^{(n)})^2
 \end{align*}
